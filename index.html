@@ -659,6 +659,13 @@
     .about-credit a:not(.btn) { color: var(--accent); font-weight: 700; text-decoration: none; }
     .about-credit a:not(.btn):hover { text-decoration: underline; text-underline-offset: 3px; }
     .about-github { text-decoration: none; }
+    .about-release { padding: 12px 13px; border: 1px solid rgba(255,255,255,.08); border-radius: 11px; background: rgba(255,255,255,.025); }
+    .about-release > strong { display: block; margin-bottom: 8px; font-size: 13px; color: #e6edf7; }
+    .about-release-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+    .about-version { padding: 3px 9px; border-radius: 7px; border: 1px solid rgba(91,216,245,.3); background: rgba(91,216,245,.08); color: #d9f6fc; font: 700 12px/1.4 ui-monospace, Consolas, monospace; }
+    .about-release-date { color: #aab4c4; font-size: 12px; }
+    .about-changelog { margin-left: auto; color: var(--accent); font-size: 12px; font-weight: 700; text-decoration: none; }
+    .about-changelog:hover { text-decoration: underline; text-underline-offset: 3px; }
     .footer a:hover { text-decoration: underline; text-underline-offset: 3px; }
     .footer-credit { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
     .footer-heart { display: inline-block; animation: footer-heartbeat 1.8s ease-in-out infinite; transform-origin: center; }
@@ -1899,10 +1906,19 @@ Ví dụ: &b&lWelcome
                 <article class="format-card"><strong data-about="f3Title"></strong><p class="hint" data-about="f3"></p></article>
                 <article class="format-card"><strong data-about="f4Title"></strong><p class="hint" data-about="f4"></p></article>
               </div>
+              <div class="about-release" id="aboutRelease">
+                <strong data-about="releaseTitle"></strong>
+                <div class="about-release-row">
+                  <span class="about-version" id="aboutVersion"></span>
+                  <span class="about-release-date" id="aboutReleaseDate"></span>
+                  <span class="import-status" id="aboutReleaseStatus" data-state="loading" role="status"></span>
+                  <a class="about-changelog" id="aboutChangelog" href="https://github.com/AnyaChann/MOTD-Lab/releases" target="_blank" rel="noopener noreferrer" data-about="changelog"></a>
+                </div>
+              </div>
               <div class="about-privacy"><strong data-about="privacyTitle"></strong><p class="hint" data-about="privacy"></p></div>
               <div class="about-credit">
                 <span><span data-credit="pre">Made for 2c2tmc with</span> <span class="footer-heart" role="img" aria-label="love">💖</span> <span data-credit="by">by</span> <a href="https://github.com/AnyaChann" target="_blank" rel="noopener noreferrer">AnyaChann</a></span>
-                <a class="btn small about-github" href="https://github.com/AnyaChann" target="_blank" rel="noopener noreferrer">
+                <a class="btn small about-github" href="https://github.com/AnyaChann/MOTD-Lab" target="_blank" rel="noopener noreferrer">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.1-1.3-.4-2.6-1.3-3.6.4-1.1.4-2.4 0-3.5 0 0-1.1-.3-3.6 1.4a12.4 12.4 0 0 0-6.2 0C6.4 2.6 5.3 2.9 5.3 2.9c-.4 1.1-.4 2.4 0 3.5A5.4 5.4 0 0 0 4 10c0 3.5 3 5.5 6 5.5-.4.4-.8 1.1-.9 2.1M9 18c-4.5 2-5-2-7-2"/></svg>
                   <span>GitHub</span>
                 </a>
@@ -1992,8 +2008,10 @@ Ví dụ: &b&lWelcome
             f2Title: "Nhiều định dạng output", f2: "Chuyển đổi giữa Legacy &, Raw §, Bukkit &x, MiniMessage và IridiumColorAPI. Phần nào chuyển đổi chỉ gần đúng sẽ được ghi chú rõ.",
             f3Title: "Lấy MOTD từ server", f3: "Nhập địa chỉ server để ping, nhập sẵn MOTD, icon, version và số người chơi vào trình chỉnh sửa.",
             f4Title: "Soạn nhanh, ít thao tác", f4: "Bảng mã màu, căn dòng, undo/redo, preset và Input Preview giúp nhìn ra mỗi tag ảnh hưởng đến đoạn chữ nào.",
+            releaseTitle: "Phiên bản", changelog: "Lịch sử thay đổi ↗",
+            relLoading: "Đang kiểm tra GitHub…", relLive: "Từ GitHub Releases", relNone: "Chưa có release trên GitHub", relFallback: "Không kết nối được GitHub · dùng số đã ghi",
             privacyTitle: "Dữ liệu của bạn",
-            privacy: "Nội dung bạn soạn chỉ được lưu trong localStorage của trình duyệt này, không cần tài khoản. Riêng chức năng Ping & import sẽ gửi địa chỉ server bạn nhập tới api.mcstatus.io để lấy thông tin."
+            privacy: "Nội dung bạn soạn chỉ được lưu trong localStorage của trình duyệt này, không cần tài khoản. Chức năng Ping & import gửi địa chỉ server bạn nhập tới api.mcstatus.io. Khi bạn mở trang Giới thiệu, trang cũng hỏi api.github.com để biết bản phát hành mới nhất; không có nội dung nào bạn soạn được gửi đi."
           }
         },
         en: {
@@ -2058,8 +2076,10 @@ Ví dụ: &b&lWelcome
             f2Title: "Multiple output formats", f2: "Convert between Legacy &, Raw §, Bukkit &x, MiniMessage and IridiumColorAPI. Conversions that are only approximate are clearly noted.",
             f3Title: "Get MOTD from server", f3: "Enter a server address to ping it and load its MOTD, icon, version and player count into the editor.",
             f4Title: "Fast to write", f4: "Color codes, alignment, undo/redo, presets and Input Preview show which text each tag affects.",
+            releaseTitle: "Version", changelog: "Changelog ↗",
+            relLoading: "Checking GitHub…", relLive: "From GitHub Releases", relNone: "No GitHub release yet", relFallback: "Can't reach GitHub · showing built-in value",
             privacyTitle: "Your data",
-            privacy: "What you write is stored only in this browser's localStorage, with no account needed. Only Ping & import sends the server address you enter to api.mcstatus.io to fetch its status."
+            privacy: "What you write is stored only in this browser's localStorage, with no account needed. Ping & import sends the server address you enter to api.mcstatus.io. When you open the About page, it also asks api.github.com for the latest release; nothing you write is sent."
           }
         }
       };
@@ -2153,6 +2173,68 @@ Ví dụ: &b&lWelcome
         { format: "reset", className: "", strokeWidth: 2, title: "Reset (&r / <reset>)", icon: `<path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>` },
         { format: "linebreak", className: "", strokeWidth: 2, title: "Xuống dòng (\\n / <newline>)", icon: `<path d="M9 10l-5 5 5 5M20 4v7a4 4 0 0 1-4 4H4"/>` }
       ];
+
+      const APP_REPO = "AnyaChann/MOTD-Lab";
+      const APP_VERSION = "v1.0.0";
+      const APP_RELEASE_DATE = "2026-10-02";
+      const releaseInfo = { state: "fallback", version: APP_VERSION, date: APP_RELEASE_DATE, url: `https://github.com/${APP_REPO}/releases`, loading: false, lastTry: 0 };
+
+      function formatReleaseDate(value) {
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return "";
+        return d.toLocaleDateString(language === "en" ? "en-US" : "vi-VN", { year: "numeric", month: "2-digit", day: "2-digit" });
+      }
+
+      function renderReleaseInfo() {
+        const version = document.getElementById("aboutVersion");
+        if (!version) return;
+        version.textContent = releaseInfo.version;
+        document.getElementById("aboutReleaseDate").textContent = formatReleaseDate(releaseInfo.date);
+        document.getElementById("aboutChangelog").href = releaseInfo.url;
+        const pill = document.getElementById("aboutReleaseStatus");
+        const map = {
+          loading: ["loading", "relLoading"], live: ["success", "relLive"],
+          none: ["offline", "relNone"], fallback: ["offline", "relFallback"]
+        };
+        const [dataState, key] = map[releaseInfo.state] || map.fallback;
+        pill.dataset.state = dataState;
+        pill.textContent = I18N[language].about[key];
+      }
+
+      async function loadReleaseInfo() {
+        if (releaseInfo.loading || releaseInfo.state === "live") return;
+        if (Date.now() - releaseInfo.lastTry < 30000) return;
+        releaseInfo.loading = true;
+        releaseInfo.lastTry = Date.now();
+        releaseInfo.state = "loading";
+        renderReleaseInfo();
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 8000);
+        try {
+          const res = await fetch(`https://api.github.com/repos/${APP_REPO}/releases/latest`, {
+            headers: { Accept: "application/vnd.github+json" }, signal: controller.signal
+          });
+          if (res.status === 404) {
+            releaseInfo.state = "none";
+          } else if (!res.ok) {
+            throw new Error(`GitHub ${res.status}`);
+          } else {
+            const data = await res.json();
+            if (!data.tag_name) throw new Error("No tag_name");
+            releaseInfo.version = String(data.tag_name).slice(0, 40);
+            releaseInfo.date = data.published_at || data.created_at || APP_RELEASE_DATE;
+            const prefix = `https://github.com/${APP_REPO}/`;
+            releaseInfo.url = typeof data.html_url === "string" && data.html_url.startsWith(prefix) ? data.html_url : `https://github.com/${APP_REPO}/releases`;
+            releaseInfo.state = "live";
+          }
+        } catch (error) {
+          releaseInfo.state = "fallback";
+        } finally {
+          clearTimeout(timer);
+          releaseInfo.loading = false;
+          renderReleaseInfo();
+        }
+      }
 
       const STORAGE_KEYS = {
         paletteCollapsed: "2c2t_paletteCollapsed",
@@ -2311,6 +2393,7 @@ Ví dụ: &b&lWelcome
         setTextNode($(".about-menu-label"), t("labels.about"));
         setTextNode($("#aboutTitle"), t("labels.about"));
         $$("[data-about]").forEach((el) => { el.textContent = I18N[language].about[el.dataset.about] || ""; });
+        renderReleaseInfo();
 
         setTextNode($("#motdView .panel-head .panel-title"), t("labels.generator"));
         setElementTextNode($("#motdView .preview-title"), t("labels.previewServerList"));
@@ -4263,6 +4346,7 @@ Ví dụ: &b&lWelcome
         requestAnimationFrame(handleViewportChange);
         const rail = $(".editor-rail");
         if (rail) rail.classList.toggle("is-hidden", viewId === "formatView" || viewId === "aboutView");
+        if (viewId === "aboutView") loadReleaseInfo();
         if (persist) {
           localStorage.setItem(STORAGE_KEYS.activeTab, viewId);
           persistUiState();
