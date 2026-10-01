@@ -2891,8 +2891,12 @@ Ví dụ: &b&lWelcome
         // Prefer Raw § even if a mixed source also happens to contain &x.
         if (hasSectionHex) return "section";
         if (hasBukkitHex) return "bukkit";
-        if (/<(?:solid):[0-9a-f]{6}>/i.test(text) || /<(?:gradient):(?:[0-9a-f]{6})(?::[0-9a-f]{6})+>/i.test(text) || /<rainbow\d*>/i.test(text)) return "iridium";
-        if (/<(?:#[0-9a-f]{6}|gradient:|rainbow|bold\b|italic\b|underlined?\b|strikethrough\b|obfuscated\b|newline\b|reset\b)/i.test(text)) return "mini";
+        // Iridium: <SOLID:RRGGBB>, <GRADIENT:RRGGBB>…</GRADIENT:RRGGBB>, <RAINBOWn>.
+        // A bare <rainbow> / <rainbow:phase> (no digits) is MiniMessage, not Iridium.
+        if (/<solid:[0-9a-f]{6}>/i.test(text) || /<gradient:[0-9a-f]{6}(?::[0-9a-f]{6})*>/i.test(text) || /<\/gradient:[0-9a-f]{6}>/i.test(text) || /<rainbow\d+>/i.test(text)) return "iridium";
+        // &#RRGGBB and #{RRGGBB} are accepted on input but are not one of the export targets.
+        if (/&#[0-9a-f]{6}/i.test(text) || /#\{[0-9a-f]{6}\}/i.test(text)) return "hash";
+        if (/<(?:#[0-9a-f]{6}|(?:color|colour|c):|gradient:|rainbow|bold\b|italic\b|underlined?\b|strikethrough\b|obfuscated\b|newline\b|reset\b)/i.test(text)) return "mini";
         if (text.includes("§")) return "section";
         if (/(?:^|[^&])&[0-9a-fk-or]/i.test(text)) return "legacy";
         return "plain";
@@ -3088,6 +3092,14 @@ Ví dụ: &b&lWelcome
               i += rawCode.length;
               continue;
             }
+            if (prefix === "&") {
+              const hashMatch = text.slice(i).match(/^&#([0-9a-fA-F]{6})/);
+              if (hashMatch) {
+                beginPersistent(hashMatch[0], "legacy-hex", i, i + 8, { ...defaultStyle(), color: `#${hashMatch[1].toUpperCase()}` });
+                i += 8;
+                continue;
+              }
+            }
             const code = (text[i + 1] || "").toLowerCase();
             if (LEGACY_COLOR_MAP[code]) {
               beginPersistent(`${prefix}${code}`, "legacy-color", i, i + 2, { ...defaultStyle(), color: LEGACY_COLOR_MAP[code] });
@@ -3221,6 +3233,15 @@ Ví dụ: &b&lWelcome
                   bufferStart = end + 1;
                   i = end + 1;
                   continue;
+                }
+                if (name === "color" || name === "colour" || name === "c") {
+                  const value = (body.split(":")[1] || "").trim().toLowerCase();
+                  const resolved = /^#[0-9a-f]{6}$/.test(value) ? value.toUpperCase() : MINI_COLOR_NAMES[value];
+                  if (resolved) {
+                    beginPaired(rawTag, "mini-color", i, end + 1, name, { ...style, color: resolved, gradId: null });
+                    i = end + 1;
+                    continue;
+                  }
                 }
                 if (/^#[0-9a-f]{6}$/.test(name)) {
                   beginPaired(rawTag, "mini-color", i, end + 1, name, { ...style, color: name.toUpperCase(), gradId: null });
@@ -3497,6 +3518,7 @@ Ví dụ: &b&lWelcome
       }
 
       function serializeTokensToLegacy(tokens, mode = "legacy") {
+        tokens = expandGradientTokens(tokens);
         const output = [];
         let currentColor = null;
         let currentStyles = { obfuscated: false, bold: false, strikethrough: false, underline: false, italic: false };
@@ -3527,42 +3549,111 @@ Ví dụ: &b&lWelcome
         return output.join("");
       }
 
-      function serializeTokensToMini(tokens) {
-        const output = [];
+      /* ---- Gradient-aware serializers ----
+         Gradient / rainbow tokens carry `grad`. Tag targets (MiniMessage, Iridium) emit the
+         native tag when they can express it; otherwise (and for every legacy / § / &x target)
+         the gradient is expanded into one colour per character instead of a flat average. */
+      const STYLE_KEYS = ["obfuscated", "bold", "strikethrough", "underline", "italic"];
+      const MINI_STYLE_TAGS = { obfuscated: "obf", bold: "b", strikethrough: "st", underline: "u", italic: "i" };
+      const LEGACY_STYLE_CODES = { obfuscated: "k", bold: "l", strikethrough: "m", underline: "n", italic: "o" };
+      const sameStyle = (a, b) => STYLE_KEYS.every((key) => Boolean(a[key]) === Boolean(b[key]));
+
+      function expandGradientTokens(tokens) {
+        const out = [];
+        for (const token of tokens) {
+          if (!token.grad || token.linebreak) { out.push(token); continue; }
+          Array.from(token.text || "").forEach((char, k) => {
+            const { grad, gradId, ...rest } = token;
+            out.push({ ...rest, text: char, color: gradientColorAt(token, k) });
+          });
+        }
+        return out;
+      }
+
+      function splitGradientRuns(tokens) {
+        const runs = [];
+        for (const token of tokens) {
+          const last = runs[runs.length - 1];
+          if (token.grad && last && last.gradId === token.gradId) { last.tokens.push(token); continue; }
+          if (!token.grad && token.linebreak && last && last.gradId != null && token.gradId === last.gradId) { last.tokens.push(token); continue; }
+          if (!token.grad && last && last.gradId == null) { last.tokens.push(token); continue; }
+          runs.push({ gradId: token.grad ? token.gradId : null, grad: token.grad || null, tokens: [token] });
+        }
+        return runs;
+      }
+
+      function miniSegment(tokens, withColor) {
+        const out = [];
         let previousColor = null;
         let run = null;
-        const keys = ["obfuscated", "bold", "strikethrough", "underline", "italic"];
-        const sameStyle = (a, b) => keys.every((key) => Boolean(a[key]) === Boolean(b[key]));
         const flush = () => {
           if (!run) return;
-          if (run.color !== previousColor) output.push(miniColor(run.color));
-          const tags = [["obfuscated", "obf"], ["bold", "b"], ["strikethrough", "st"], ["underline", "u"], ["italic", "i"]];
-          const opens = tags.filter(([key]) => run[key]).map(([, tag]) => `<${tag}>`).join("");
-          const closes = tags.filter(([key]) => run[key]).reverse().map(([, tag]) => `</${tag}>`).join("");
-          output.push(`${opens}${escapeMini(run.text)}${closes}`);
+          if (withColor && run.color !== previousColor) out.push(miniColor(run.color));
+          const on = STYLE_KEYS.filter((key) => run[key]);
+          out.push(`${on.map((key) => `<${MINI_STYLE_TAGS[key]}>`).join("")}${escapeMini(run.text)}${on.slice().reverse().map((key) => `</${MINI_STYLE_TAGS[key]}>`).join("")}`);
           previousColor = run.color;
           run = null;
         };
         for (const token of tokens) {
-          if (token.linebreak) { flush(); output.push("<newline>"); previousColor = null; continue; }
+          if (token.linebreak) { flush(); out.push("<newline>"); previousColor = null; continue; }
           if (run && run.color === token.color && sameStyle(run, token)) run.text += String(token.text ?? "");
           else { flush(); run = { ...token, text: String(token.text ?? "") }; }
         }
         flush();
-        return output.join("");
+        return out.join("");
+      }
+
+      const isPlainRainbow = (g) => g.type === "rainbow" && (g.saturation ?? 1) === 1 && (g.value ?? 1) === 1;
+
+      function serializeTokensToMini(tokens) {
+        return splitGradientRuns(tokens).map((run) => {
+          const g = run.grad;
+          if (!g) return miniSegment(run.tokens, true);
+          if (g.type === "gradient" && g.stops.length >= 2) return `<gradient:${g.stops.join(":")}>${miniSegment(run.tokens, false)}</gradient>`;
+          if (isPlainRainbow(g) && !(g.phase && g.reverse)) {
+            const arg = g.reverse ? ":!" : g.phase ? `:${g.phase}` : "";
+            return `<rainbow${arg}>${miniSegment(run.tokens, false)}</rainbow>`;
+          }
+          return miniSegment(expandGradientTokens(run.tokens), true);
+        }).join("");
+      }
+
+      function iridiumSegment(tokens, withColor) {
+        let out = "";
+        let previousColor = null;
+        let active = {};
+        for (const token of tokens) {
+          if (token.linebreak) { out += "\n"; previousColor = null; active = {}; continue; }
+          const colorChanged = withColor && token.color !== previousColor;
+          const disabling = STYLE_KEYS.some((key) => active[key] && !token[key]);
+          if (colorChanged || disabling) {
+            // A colour code resets formatting in-game, so re-emitting the colour is enough to switch a style off.
+            if (withColor) { out += iridiumColor(token.color); previousColor = token.color; }
+            active = {};
+          }
+          for (const key of STYLE_KEYS) {
+            if (token[key] && !active[key]) { out += `&${LEGACY_STYLE_CODES[key]}`; active[key] = true; }
+          }
+          out += String(token.text ?? "");
+        }
+        return out;
       }
 
       function serializeTokensToIridium(tokens) {
-        let out = "";
-        let previousColor = null;
-        for (const token of tokens) {
-          if (token.linebreak) { out += "\n"; continue; }
-          if (token.color !== previousColor) out += iridiumColor(token.color);
-          out += styleCodes(token);
-          out += token.text;
-          previousColor = token.color;
-        }
-        return out;
+        return splitGradientRuns(tokens).map((run) => {
+          const g = run.grad;
+          if (!g) return iridiumSegment(run.tokens, true);
+          const visible = run.tokens.filter((token) => !token.linebreak);
+          const uniformStyle = visible.every((token) => sameStyle(token, visible[0]));
+          if (uniformStyle && g.type === "gradient" && g.stops.length === 2) {
+            const body = iridiumSegment(run.tokens.map((token) => ({ ...token, color: "#FFFFFF" })), false);
+            return `<GRADIENT:${g.stops[0].slice(1)}>${body}</GRADIENT:${g.stops[1].slice(1)}>`;
+          }
+          if (uniformStyle && isPlainRainbow(g) && !g.phase && !g.reverse) {
+            return `<RAINBOW1>${iridiumSegment(run.tokens, false)}</RAINBOW>`;
+          }
+          return iridiumSegment(expandGradientTokens(run.tokens), true);
+        }).join("");
       }
 
       function serializeForTarget(raw, tokens, target) {
@@ -3572,6 +3663,10 @@ Ví dụ: &b&lWelcome
             (target === "section" && source === "section") || (target === "legacy" && source === "legacy") ||
             (target === "bukkit" && source === "bukkit")) {
           return normalized;
+        }
+        // Text with no colour/format at all stays plain instead of gaining an explicit white colour code.
+        if (source === "plain" && tokens.every((token) => token.linebreak || (token.color === "#FFFFFF" && !token.grad && STYLE_KEYS.every((key) => !token[key])))) {
+          return target === "mini" ? escapeMini(normalized).replace(/\n/g, "<newline>") : normalized;
         }
         if (target === "mini") return serializeTokensToMini(tokens);
         if (target === "iridium") return serializeTokensToIridium(tokens);
