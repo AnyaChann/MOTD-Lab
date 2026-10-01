@@ -1734,7 +1734,7 @@ Ví dụ: &b&lWelcome
                   </div>
                 </details>
 
-                <div class="context-note">Enter, <code>\n</code>, <code>/n</code> hoặc <code>&lt;newline&gt;</code> đều là xuống dòng. Tool không tự cắt input.</div>
+                <div class="context-note">Enter, <code>\n</code>, <code>/n</code> (sau khoảng trắng hoặc mã màu, không trước chữ thường) hoặc <code>&lt;newline&gt;</code> đều là xuống dòng. Tool không tự cắt input.</div>
               </div>
             </div>
 
@@ -1840,7 +1840,7 @@ Ví dụ: &b&lWelcome
               <div class="panel-body">
                 <div id="textPreview" class="preview-box large"></div>
                 <div id="textOutputs" class="output-list"></div>
-                <div class="context-note">Enter, <code>\n</code>, <code>/n</code> và <code>&lt;newline&gt;</code> đều được hiểu là xuống dòng trong tool.</div>
+                <div class="context-note">Enter, <code>\n</code>, <code>/n</code> (sau khoảng trắng hoặc mã màu, không trước chữ thường) và <code>&lt;newline&gt;</code> đều được hiểu là xuống dòng trong tool.</div>
               </div>
             </div>
           </div>
@@ -1964,10 +1964,10 @@ Ví dụ: &b&lWelcome
             undo: "Undo · Ctrl+Z", redo: "Redo · Ctrl+Y / Ctrl+Shift+Z", clearContent: "Xóa nội dung",
             inputMapping: "Xem trước input · ánh xạ nguồn", map: "MAP", serverIcon: "Icon server:",
             serverIconPick: "Chọn ảnh logo server", importAddress: "Địa chỉ server (IP hoặc domain)", importHint: "VD: play.example.com hoặc play.example.com:25565 · Enter để ping", pingImport: "Ping & import",
-            contextLinesMotd: "Enter, \\n, /n hoặc <newline> đều là xuống dòng. Tool không tự cắt input, nhưng server list chỉ hiển thị 2 dòng, mỗi dòng tối đa 271px.",
+            contextLinesMotd: "Enter, \\n, /n (sau khoảng trắng hoặc mã màu, không trước chữ thường) hoặc <newline> đều là xuống dòng. Tool không tự cắt input, nhưng server list chỉ hiển thị 2 dòng, mỗi dòng tối đa 271px.",
             previewServerList: "Xem trước server list", copyLegacy: "Copy MOTD Legacy", copyProperties: "Copy server.properties",
             previewHint: "Preview tự co theo màn hình. Vùng chữ rộng đúng 271px như server list của Minecraft (đường nét đứt đỏ là mép giới hạn); dòng vượt giới hạn sẽ bị Minecraft ngắt xuống dòng.",
-            liveOutput: "Output trực tiếp", contextLinesEditor: "Enter, \n, /n và <newline> đều được hiểu là xuống dòng trong tool.",
+            liveOutput: "Output trực tiếp", contextLinesEditor: "Enter, \n, /n (sau khoảng trắng hoặc mã màu, không trước chữ thường) và <newline> đều được hiểu là xuống dòng trong tool.",
             emptyContent: "Chưa có nội dung", outputTargets: "Định dạng đầu ra", deployTargets: "Đích triển khai",
             copy: "Copy", characters: "Ký tự: {count}", lineCounter: "Dòng 1: {w1}/{max}px · Dòng 2: {w2}/{max}px", hiddenLines: "+{count} dòng bị ẩn", lineTooWide: "Dòng này vượt {max}px — Minecraft sẽ tự ngắt xuống dòng", optionalBadge: "TÙY Ý",
             lineCounterTitle: "Giới hạn thật của Minecraft: vùng MOTD trong server list rộng {max}px và chỉ hiển thị 2 dòng. Chữ in đậm tốn thêm 1px mỗi ký tự; chữ hẹp như i, l, ! chiếm ít chỗ hơn chữ rộng nên số ký tự không phải giới hạn.",
@@ -2032,10 +2032,10 @@ Ví dụ: &b&lWelcome
             undo: "Undo · Ctrl+Z", redo: "Redo · Ctrl+Y / Ctrl+Shift+Z", clearContent: "Clear content",
             inputMapping: "Input Preview · source mapping", map: "MAP", serverIcon: "Server Icon:",
             serverIconPick: "Choose server icon", importAddress: "Server address (IP or domain)", importHint: "e.g. play.example.com or play.example.com:25565 · Press Enter to ping", pingImport: "Ping & import",
-            contextLinesMotd: "Enter, \n, /n or <newline> create a line break. The tool does not truncate input.",
+            contextLinesMotd: "Enter, \n, /n (after a space or colour code, not before a lowercase letter) or <newline> create a line break. The tool does not truncate input.",
             previewServerList: "Server list preview", copyLegacy: "Copy Legacy MOTD", copyProperties: "Copy server.properties",
             previewHint: "The preview scales to fit your screen. The text area is exactly 271px like Minecraft's server list (the red dashed line is the limit); a line beyond it gets wrapped by Minecraft.",
-            liveOutput: "Live output", contextLinesEditor: "Enter, \n, /n and <newline> are treated as line breaks in the tool.",
+            liveOutput: "Live output", contextLinesEditor: "Enter, \n, /n (after a space or colour code, not before a lowercase letter) and <newline> are treated as line breaks in the tool.",
             emptyContent: "No content", outputTargets: "Output targets", deployTargets: "Deploy targets",
             copy: "Copy", characters: "Characters: {count}", lineCounter: "Line 1: {w1}/{max}px · Line 2: {w2}/{max}px", hiddenLines: "+{count} hidden line(s)", lineTooWide: "This line exceeds {max}px — Minecraft will wrap it", optionalBadge: "OPTIONAL",
             lineCounterTitle: "Minecraft's real limit: the server-list MOTD area is {max}px wide and shows only 2 lines. Bold adds 1px per character; narrow glyphs like i, l, ! take less room, so character count is not the limit.",
@@ -2424,10 +2424,10 @@ Ví dụ: &b&lWelcome
         setTextNode($("#motdView .input-preview-details summary span:first-child"), t("labels.inputMapping"));
         setTextNode($("#textView .input-preview-details summary span:first-child"), t("labels.inputMapping"));
         const motdContextNotes = $$("#motdView .context-note");
-        if (motdContextNotes[0]) motdContextNotes[0].innerHTML = `${escapeHtml(language === "en" ? "Enter, " : "Enter, ")}<code>\\n</code>${language === "en" ? ", /n or " : ", /n hoặc "}<code>&lt;newline&gt;</code>${language === "en" ? " create a line break. The tool does not truncate input, but the server list shows only 2 lines, each up to 271px." : " đều là xuống dòng. Tool không tự cắt input, nhưng server list chỉ hiển thị 2 dòng, mỗi dòng tối đa 271px."}`;
+        if (motdContextNotes[0]) motdContextNotes[0].innerHTML = `${escapeHtml(language === "en" ? "Enter, " : "Enter, ")}<code>\\n</code>${language === "en" ? ", /n (after a space or colour code, not before a lowercase letter) or " : ", /n (sau khoảng trắng hoặc mã màu, không trước chữ thường) hoặc "}<code>&lt;newline&gt;</code>${language === "en" ? " create a line break. The tool does not truncate input, but the server list shows only 2 lines, each up to 271px." : " đều là xuống dòng. Tool không tự cắt input, nhưng server list chỉ hiển thị 2 dòng, mỗi dòng tối đa 271px."}`;
         if (motdContextNotes[1]) motdContextNotes[1].innerHTML = escapeHtml(t("labels.previewHint"));
         const textContext = $("#textView .context-note");
-        if (textContext) textContext.innerHTML = `${language === "en" ? "Enter, " : "Enter, "}<code>\\n</code>${language === "en" ? ", /n and " : ", /n và "}<code>&lt;newline&gt;</code>${language === "en" ? " are treated as line breaks in the tool. Alignment follows the width of the preview." : " đều được hiểu là xuống dòng trong tool. Căn dòng theo độ rộng của khung preview."}`;
+        if (textContext) textContext.innerHTML = `${language === "en" ? "Enter, " : "Enter, "}<code>\\n</code>${language === "en" ? ", /n (after a space or colour code, not before a lowercase letter) and " : ", /n (sau khoảng trắng hoặc mã màu, không trước chữ thường) và "}<code>&lt;newline&gt;</code>${language === "en" ? " are treated as line breaks in the tool. Alignment follows the width of the preview." : " đều được hiểu là xuống dòng trong tool. Căn dòng theo độ rộng của khung preview."}`;
 
         setTextNode($("#footerAuto"), t("labels.footerAuto"));
         setTextNode($("#footerTools"), t("labels.footerTools"));
@@ -2651,7 +2651,19 @@ Ví dụ: &b&lWelcome
       let editorAlignedWidth = null;
 
       function splitMotdSourceLines(raw) {
-        return String(raw ?? "").split(/(\r\n|\r|\n|\\n|\/n)/);
+        // Returns [line, separator, line, separator, ...]; a "/n" that is not a break stays inside its line.
+        const text = String(raw ?? "");
+        const parts = [];
+        let last = 0;
+        const re = /\r\n|\r|\n|\\n|\/n/g;
+        let match;
+        while ((match = re.exec(text))) {
+          if (match[0] === "/n" && !isSlashNBreak(text, match.index)) continue;
+          parts.push(text.slice(last, match.index), match[0]);
+          last = match.index + match[0].length;
+        }
+        parts.push(text.slice(last));
+        return parts;
       }
 
       function tokenPixelWidth(tokens) {
@@ -2880,7 +2892,20 @@ Ví dụ: &b&lWelcome
         return String(raw ?? "")
           .replace(/\r\n?/g, "\n")
           .replace(/\\n/g, "\n")
-          .replace(/\/n/g, "\n");
+          .replace(/\/n(?![a-z])/g, (match, offset, whole) => (isSlashNBreak(whole, offset) ? "\n" : match));
+      }
+
+      // "/n" is a line break only when it follows whitespace, a colour code, a closing tag,
+      // another line break, or the start of the text - and is not directly followed by a
+      // lowercase letter. Commands and URL paths ("&a/nick", "play.com/news", "Line1/nLine2")
+      // therefore stay as text. Use "\n", <newline> or Enter for every other case.
+      function isSlashNBreak(text, index) {
+        if (text[index] !== "/" || text[index + 1] !== "n") return false;
+        if (/[a-z]/.test(text[index + 2] || "")) return false;
+        const before = text.slice(0, index);
+        if (before === "") return true;
+        if (/(?:\s|\\n|<[^<>\n]*>|#\{[0-9a-f]{6}\}|&#[0-9a-f]{6}|[&§][0-9a-fk-or])$/i.test(before)) return true;
+        return before.endsWith("/n") && isSlashNBreak(text, index - 2);
       }
 
       function detectSourceSyntax(raw) {
@@ -3076,7 +3101,7 @@ Ví dụ: &b&lWelcome
             i += 1;
             continue;
           }
-          if ((char === "\\" || char === "/") && text[i + 1] === "n") {
+          if ((char === "\\" || isSlashNBreak(text, i)) && text[i + 1] === "n") {
             pushLinebreak(i, i + 2);
             i += 2;
             continue;
