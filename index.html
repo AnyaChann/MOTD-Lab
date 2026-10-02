@@ -593,6 +593,12 @@
     .output-format-label .format-name { color: #d9f6fc; font-weight: 800; letter-spacing: .01em; }
     .output-format-label { max-width: 100%; }
     .output-format-label small { display: block; min-width: 0; max-width: 100%; color: #687789; font-size: 10px; font-weight: 500; line-height: 1.35; overflow-wrap: anywhere; word-break: break-word; }
+    .color-style-switch { display: inline-flex; align-self: flex-start; margin-top: 4px; border: 1px solid rgba(255,255,255,.08); border-radius: 6px; overflow: hidden; background: rgba(255,255,255,.025); }
+    .color-style-btn { min-height: 20px; padding: 2px 7px; border: 0; background: transparent; color: #7f8da0; font: 700 10px/1.3 "Cascadia Mono", Consolas, monospace; cursor: pointer; transition: background .16s ease, color .16s ease; }
+    .color-style-btn + .color-style-btn { border-left: 1px solid rgba(255,255,255,.08); }
+    .color-style-btn:hover { color: #d9f6fc; background: rgba(255,255,255,.05); }
+    .color-style-btn.active { color: #d9f6fc; background: rgba(91,216,245,.16); }
+    .color-style-btn:focus-visible { outline: 2px solid rgba(66,212,245,.55); outline-offset: -2px; }
     .format-note-highlight {
       display: inline-block; max-width: 100%; box-sizing: border-box; margin: 2px 2px 0 0; padding: 1px 5px; border-radius: 4px;
       color: #bfeff8; background: rgba(91,216,245,.09); border: 1px solid rgba(91,216,245,.12);
@@ -1984,7 +1990,7 @@ Ví dụ: &b&lWelcome
             paletteHint: "Click màu để chèn · hiện tại: {syntax}", searchColors: "Tìm màu hoặc &code…", searchAria: "Tìm màu",
             insertionSyntax: "Cú pháp chèn", colorPicker: "Chọn màu tùy ý", insertColor: "Chèn màu đang chọn", customHex: "Hex màu tùy ý", customColor: "Màu tùy ý",
             insert: "Chèn", copyHex: "Copy hex", filterGroups: "Lọc nhóm màu", tools: "Công cụ", color: "Màu",
-            formatToolbar: "Bộ định dạng", colorToolbar: "Bộ chọn màu", alignmentToolbar: "Căn dòng MOTD", scrollLeft: "Cuộn sang trái", scrollRight: "Cuộn sang phải", alignLeft: "Căn trái", alignCenter: "Căn giữa", alignRight: "Căn phải", live: "Live",
+            formatToolbar: "Bộ định dạng", colorToolbar: "Bộ chọn màu", alignmentToolbar: "Căn dòng MOTD", scrollLeft: "Cuộn sang trái", colorStyle: "Dạng mã màu", scrollRight: "Cuộn sang phải", alignLeft: "Căn trái", alignCenter: "Căn giữa", alignRight: "Căn phải", live: "Live",
             generator: "MOTD Generator", editor: "MOTD Editor", notes: "Format Notes", about: "Giới thiệu",
             formatShowcase: "Giới thiệu format", noPreset: "No preset", starterPreset: "Preset: starter", examplePreset: "Preset: example", helpPreset: "Preset: help line", whisperPreset: "Preset: whisper format", statusPreset: "Preset: status states",
             presetMotd: "Preset MOTD", presetUniversal: "Preset universal editor",
@@ -2052,7 +2058,7 @@ Ví dụ: &b&lWelcome
             paletteHint: "Click a color to insert · current: {syntax}", searchColors: "Search colors or &code…", searchAria: "Search colors",
             insertionSyntax: "Insertion syntax", colorPicker: "Pick custom color", insertColor: "Insert selected color", customHex: "Custom color hex", customColor: "Custom color",
             insert: "Insert", copyHex: "Copy hex", filterGroups: "Filter color groups", tools: "Tools", color: "Color",
-            formatToolbar: "Formatting toolbar", colorToolbar: "Color picker", alignmentToolbar: "MOTD line alignment", scrollLeft: "Scroll left", scrollRight: "Scroll right", alignLeft: "Align left", alignCenter: "Align center", alignRight: "Align right", live: "Live",
+            formatToolbar: "Formatting toolbar", colorToolbar: "Color picker", alignmentToolbar: "MOTD line alignment", scrollLeft: "Scroll left", colorStyle: "Color code style", scrollRight: "Scroll right", alignLeft: "Align left", alignCenter: "Align center", alignRight: "Align right", live: "Live",
             generator: "MOTD Generator", editor: "MOTD Editor", notes: "Format Notes", about: "About",
             formatShowcase: "Format showcase", noPreset: "No preset", starterPreset: "Preset: starter", examplePreset: "Preset: example", helpPreset: "Preset: help line", whisperPreset: "Preset: whisper format", statusPreset: "Preset: status states",
             presetMotd: "MOTD preset", presetUniversal: "Universal editor preset",
@@ -2289,7 +2295,8 @@ Ví dụ: &b&lWelcome
         motdImportOpen: "2c2t_motdImportOpen",
         motdOptionsOpen: "2c2t_motdOptionsOpen",
         lastPingData: "2c2t_lastPingData",
-        lastSaved: "2c2t_lastSaved"
+        lastSaved: "2c2t_lastSaved",
+        outputColorFormats: "2c2t_outputColorFormats"
       };
 
       const MC_CODE_TOKEN_RE = /[&§]x([&§][0-9a-f]){6}|[&§][0-9a-fk-or]|./gis;
@@ -3588,6 +3595,7 @@ Ví dụ: &b&lWelcome
         const prefix = mode === "section" ? "§" : "&";
         const getColor = (token) => mode === "bukkit" ? ampX(token.color)
           : mode === "slp" ? (exactLegacyCode(token.color) || ampX(token.color))
+          : mode === "slp-hash" ? (exactLegacyCode(token.color) || `&#${hexBody(token.color)}`)
           : mode === "section" ? sectionColorCode(token.color) : nearestLegacy(token.color);
         const styleKeys = ["obfuscated", "bold", "strikethrough", "underline", "italic"];
         for (const token of tokens) {
@@ -3683,7 +3691,9 @@ Ví dụ: &b&lWelcome
         }).join("");
       }
 
-      function iridiumSegment(tokens, withColor) {
+      const iridiumSolidCode = (hex, style) => (style === "hash" ? `#{${hexBody(hex)}}` : iridiumColor(hex));
+
+      function iridiumSegment(tokens, withColor, solidStyle = "tag") {
         let out = "";
         let previousColor = null;
         let active = {};
@@ -3693,7 +3703,7 @@ Ví dụ: &b&lWelcome
           const disabling = STYLE_KEYS.some((key) => active[key] && !token[key]);
           if (colorChanged || disabling) {
             // A colour code resets formatting in-game, so re-emitting the colour is enough to switch a style off.
-            if (withColor) { out += iridiumColor(token.color); previousColor = token.color; }
+            if (withColor) { out += iridiumSolidCode(token.color, solidStyle); previousColor = token.color; }
             active = {};
           }
           for (const key of STYLE_KEYS) {
@@ -3704,10 +3714,10 @@ Ví dụ: &b&lWelcome
         return out;
       }
 
-      function serializeTokensToIridium(tokens) {
+      function serializeTokensToIridium(tokens, solidStyle = "tag") {
         return splitGradientRuns(tokens).map((run) => {
           const g = run.grad;
-          if (!g) return iridiumSegment(run.tokens, true);
+          if (!g) return iridiumSegment(run.tokens, true, solidStyle);
           const visible = run.tokens.filter((token) => !token.linebreak);
           const uniformStyle = visible.every((token) => sameStyle(token, visible[0]));
           if (uniformStyle && g.type === "gradient" && g.stops.length === 2) {
@@ -3717,14 +3727,40 @@ Ví dụ: &b&lWelcome
           if (uniformStyle && isPlainRainbow(g) && !g.phase && !g.reverse) {
             return `<RAINBOW1>${iridiumSegment(run.tokens, false)}</RAINBOW>`;
           }
-          return iridiumSegment(expandGradientTokens(run.tokens), true);
+          return iridiumSegment(expandGradientTokens(run.tokens), true, solidStyle);
         }).join("");
       }
 
-      function serializeForTarget(raw, tokens, target) {
+      /* Output colour-code styles for targets that accept more than one spelling.
+         slpRgb:       "x" -> &x&r&r&g&g&b&b   | "hash" -> &#rrggbb      (ServerListPlus, documented in its wiki)
+         iridiumSolid: "tag" -> <SOLID:RRGGBB> | "hash" -> #{RRGGBB}     (IridiumColorAPI) */
+      const OUTPUT_COLOR_STYLES = {
+        slp: { key: "slpRgb", fallback: "x", choices: [["x", "&x&r&g&b"], ["hash", "&#rrggbb"]] },
+        iridium: { key: "iridiumSolid", fallback: "tag", choices: [["tag", "<SOLID:>"], ["hash", "#{rrggbb}"]] }
+      };
+      let outputColorFormats = { slpRgb: "x", iridiumSolid: "tag" };
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.outputColorFormats) || "null");
+        Object.values(OUTPUT_COLOR_STYLES).forEach(({ key, choices }) => {
+          if (saved && choices.some(([value]) => value === saved[key])) outputColorFormats[key] = saved[key];
+        });
+      } catch (error) { /* corrupted value: keep defaults */ }
+
+      function setOutputColorStyle(group, value) {
+        const style = OUTPUT_COLOR_STYLES[group];
+        if (!style || !style.choices.some(([choice]) => choice === value)) return false;
+        outputColorFormats = { ...outputColorFormats, [style.key]: value };
+        try { localStorage.setItem(STORAGE_KEYS.outputColorFormats, JSON.stringify(outputColorFormats)); } catch (error) { /* storage unavailable */ }
+        return true;
+      }
+
+      function serializeForTarget(raw, tokens, target, opts = outputColorFormats) {
         const source = detectSourceSyntax(raw);
         const normalized = normalizeOutputNewlines(raw);
-        if ((target === "mini" && source === "mini") || (target === "iridium" && source === "iridium") ||
+        if (target === "iridium" && source === "iridium") {
+          return opts.iridiumSolid === "hash" ? normalized.replace(/<SOLID:([0-9a-f]{6})>/gi, (match, hex) => `#{${hex}}`) : normalized;
+        }
+        if ((target === "mini" && source === "mini") ||
             (target === "section" && source === "section") || (target === "legacy" && source === "legacy") ||
             (target === "bukkit" && source === "bukkit")) {
           return normalized;
@@ -3735,9 +3771,12 @@ Ví dụ: &b&lWelcome
         }
         // ServerListPlus (v3.5.0+) understands &c codes and RGB as &x&r&r&g&g&b&b / &#rrggbb:
         // keep classic codes where the colour is exact and RGB (gradients included) everywhere else.
-        if (target === "slp") return source === "legacy" || source === "bukkit" ? normalized : serializeTokensToLegacy(tokens, "slp");
+        if (target === "slp") {
+          const hash = opts.slpRgb === "hash";
+          return source === "legacy" || (source === "bukkit" && !hash) ? normalized : serializeTokensToLegacy(tokens, hash ? "slp-hash" : "slp");
+        }
         if (target === "mini") return serializeTokensToMini(tokens);
-        if (target === "iridium") return serializeTokensToIridium(tokens);
+        if (target === "iridium") return serializeTokensToIridium(tokens, opts.iridiumSolid === "hash" ? "hash" : "tag");
         if (target === "section") return serializeTokensToLegacy(tokens, "section");
         if (target === "bukkit") return serializeTokensToLegacy(tokens, "bukkit");
         return serializeTokensToLegacy(tokens, "legacy");
@@ -3882,8 +3921,16 @@ Ví dụ: &b&lWelcome
         }).join('<span class="nl-mark">↵</span>');
       }
 
-      function renderOutputLabel(label, note) {
-        return `<span class="output-format-label"><span class="format-name">${escapeHtml(label)}</span><small>${formatOutputNoteHtml(note)}</small></span>`;
+      function renderColorStyleSwitch(group) {
+        const style = OUTPUT_COLOR_STYLES[group];
+        if (!style) return "";
+        const active = outputColorFormats[style.key];
+        return `<span class="color-style-switch" role="group" aria-label="${escapeHtml(t("labels.colorStyle"))}">${style.choices.map(([value, text]) =>
+          `<button type="button" class="color-style-btn${value === active ? " active" : ""}" data-color-style="${group}" data-color-style-value="${value}" aria-pressed="${value === active}">${escapeHtml(text)}</button>`).join("")}</span>`;
+      }
+
+      function renderOutputLabel(label, note, styleGroup) {
+        return `<span class="output-format-label"><span class="format-name">${escapeHtml(label)}</span><small>${formatOutputNoteHtml(note)}</small>${styleGroup ? renderColorStyleSwitch(styleGroup) : ""}</span>`;
       }
 
       function renderTextOutput() {
@@ -3907,15 +3954,15 @@ Ví dụ: &b&lWelcome
           ["Raw §", serializeForTarget(raw, tokens, "section"), conversionNote(raw, "section")],
           ["Bukkit &x", serializeForTarget(raw, tokens, "bukkit"), conversionNote(raw, "bukkit")],
           ["MiniMessage", serializeForTarget(raw, tokens, "mini"), conversionNote(raw, "mini")],
-          ["IridiumColorAPI", serializeForTarget(raw, tokens, "iridium"), conversionNote(raw, "iridium")]
+          ["IridiumColorAPI", serializeForTarget(raw, tokens, "iridium"), conversionNote(raw, "iridium"), "iridium"]
         ];
         dom.textOutputs.innerHTML = `
           <details class="export-details" data-persist-key="textOutputsOpen">
             <summary><span>${escapeHtml(t("labels.outputTargets"))}</span><span class="details-count">${outputs.length}</span></summary>
             <div class="export-list">
-              ${outputs.map(([label, value, note]) => `
+              ${outputs.map(([label, value, note, styleGroup]) => `
                 <div class="output-row">
-                  <strong>${renderOutputLabel(label, note)}</strong>
+                  <strong>${renderOutputLabel(label, note, styleGroup)}</strong>
                   <code class="output-code" title="${escapeHtml(value)}">${renderOutputCode(value)}</code>
                   <button class="btn small" type="button" data-copy="${escapeHtml(value)}" aria-label="${escapeHtml(t("labels.copy"))} ${escapeHtml(label)}">${escapeHtml(t("labels.copy"))}</button>
                 </div>`).join("")}
@@ -4036,10 +4083,13 @@ Ví dụ: &b&lWelcome
         return String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\r?\n/g, "\\n");
       }
 
+      // The status ping shows at most two description lines, so extra input lines are never exported.
+      const SLP_MAX_DESCRIPTION_LINES = 2;
+
       function buildServerListPlusOutput(raw) {
         const source = normalizeLinebreaks(raw);
-        const lines = source.split("\n").slice(0, 2);
-        while (lines.length < 2) lines.push("");
+        const lines = source.split("\n").slice(0, SLP_MAX_DESCRIPTION_LINES);
+        while (lines.length < SLP_MAX_DESCRIPTION_LINES) lines.push("");
         // ServerListPlus.yml is a multi-document file; the status section is the document tagged
         // "--- !Status", whose top-level keys are Default / Personalized (there is no "Status:" key).
         // A list under Description means random rotation; one entry = one fixed MOTD.
@@ -4206,20 +4256,26 @@ Ví dụ: &b&lWelcome
         const section = serializeForTarget(normalized, tokens, "section");
         const bukkit = serializeForTarget(normalized, tokens, "bukkit");
         const mini = serializeForTarget(normalized, tokens, "mini");
-        const iridium = serializeForTarget(normalized, tokens, "iridium");
+        const iridium = serializeForTarget(normalized, tokens, "iridium", outputColorFormats);
         const serverProperties = `motd=${legacyToServerProperties(tokens)}`;
         const velocity = `motd = "${tomlQuoted(mini)}"`;
         const bungee = `motd: "${yamlDoubleQuoted(legacy)}"`;
-        const serverListPlus = buildServerListPlusOutput(serializeForTarget(normalized, tokens, "slp"));
+        const slpText = serializeForTarget(normalized, tokens, "slp", outputColorFormats);
+        const serverListPlus = buildServerListPlusOutput(slpText);
+        const slpInputLines = slpText.split("\n").length;
+        const slpKeptLines = Math.min(slpInputLines, SLP_MAX_DESCRIPTION_LINES);
+        const slpLineInfo = slpInputLines > SLP_MAX_DESCRIPTION_LINES
+          ? langT(`${slpKeptLines} dòng MOTD (cắt từ ${slpInputLines}) · literal newline`, `${slpKeptLines} MOTD lines (trimmed from ${slpInputLines}) · literal newline`)
+          : langT(`${slpKeptLines} dòng MOTD · literal newline`, `${slpKeptLines} MOTD ${slpKeptLines === 1 ? "line" : "lines"} · literal newline`);
         return [
           ["server.properties", serverProperties, `Vanilla / Paper · ${outputNewlineInfo(serverProperties, "escaped\n")}`],
           ["velocity.toml", velocity, `Velocity · ${outputNewlineInfo(velocity, "escaped\n")}`],
           ["BungeeCord / Waterfall", bungee, `${langT("Cấu hình proxy", "Proxy config")} · ${outputNewlineInfo(bungee, "escaped\n")}`],
-          ["ServerListPlus", serverListPlus, `${langT("YAML riêng của plugin", "Plugin-specific YAML")} · ${outputNewlineInfo(serverListPlus, "literal")}`],
+          ["ServerListPlus", serverListPlus, `${langT("YAML riêng của plugin", "Plugin-specific YAML")} · ${slpLineInfo}`, "slp"],
           ["Raw §", section, `${langT("Biểu diễn section-code", "Section-code representation")} · ${outputNewlineInfo(section, "literal")}`],
           ["Bukkit &x", bukkit, `${langT("Quy ước của plugin", "Plugin convention")} · ${outputNewlineInfo(bukkit, "literal")}`],
           ["MiniMessage", mini, `Adventure / Paper / Velocity · ${outputNewlineInfo(mini, /<newline>/i.test(mini) ? "minitag" : "literal")}`],
-          ["IridiumColorAPI", iridium, `${langT("Parser tag riêng của plugin", "Plugin-specific tag parser")} · ${outputNewlineInfo(iridium, "literal")}`]
+          ["IridiumColorAPI", iridium, `${langT("Parser tag riêng của plugin", "Plugin-specific tag parser")} · ${outputNewlineInfo(iridium, "literal")}`, "iridium"]
         ];
       }
 
@@ -4243,9 +4299,9 @@ Ví dụ: &b&lWelcome
           <details class="export-details" data-persist-key="motdOutputsOpen">
             <summary><span>${escapeHtml(t("labels.deployTargets"))}</span><span class="details-count">${outputs.length}</span></summary>
             <div class="export-list">
-              ${outputs.map(([label, value, note], index) => `
+              ${outputs.map(([label, value, note, styleGroup], index) => `
                 <section class="config-output">
-                  <div class="config-output-head">${renderOutputLabel(label, note)}<button class="btn small" type="button" data-copy-index="${index}">${escapeHtml(t("labels.copy"))}</button></div>
+                  <div class="config-output-head">${renderOutputLabel(label, note, styleGroup)}<button class="btn small" type="button" data-copy-index="${index}">${escapeHtml(t("labels.copy"))}</button></div>
                   <pre>${escapeHtml(value)}</pre>
                 </section>`).join("")}
             </div>
@@ -4770,6 +4826,17 @@ Ví dụ: &b&lWelcome
 
           const copyButton = event.target.closest("[data-copy]");
           if (copyButton) { copyText(copyButton.dataset.copy); return; }
+
+          const styleButton = event.target.closest("[data-color-style]");
+          if (styleButton) {
+            const group = styleButton.dataset.colorStyle;
+            const value = styleButton.dataset.colorStyleValue;
+            if (setOutputColorStyle(group, value)) {
+              renderTextOutput(); renderMotd();
+              document.querySelector(`[data-color-style="${group}"][data-color-style-value="${value}"]`)?.focus();
+            }
+            return;
+          }
 
           const copyIndex = event.target.closest("[data-copy-index]");
           if (copyIndex) { copyText(window.__motdCopies?.[Number(copyIndex.dataset.copyIndex)] || ""); return; }
