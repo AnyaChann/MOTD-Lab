@@ -845,11 +845,19 @@
     .tab { min-height: 34px; padding: 7px 11px; font-size: 12px; font-weight: 750; color: #687487; }
     .tab.active { color: #f4f8fb; background: rgba(255,255,255,.07); box-shadow: inset 0 -2px 0 var(--accent); }
     .tab-order-note { color: #3f4a58; font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
-    .toolbar-custom-color { display:inline-flex; align-items:center; justify-content:center; width:29px; height:29px; flex:0 0 29px; border:1px solid var(--line); border-radius:7px; background:#111620; overflow:hidden; cursor:pointer; }
-    .toolbar-color-wheel { display:block; width:25px; height:25px; padding:2px; border:0; background:transparent; cursor:pointer; }
+    /* One joined control: [colour swatch | insert arrow] share a single border and background. */
+    .color-insert { display:inline-flex; align-items:stretch; flex:0 0 auto; height:28px; border:1px solid rgba(255,255,255,.06); border-radius:7px; background:#151a22; overflow:hidden; transition:border-color .16s ease, background .16s ease; }
+    .color-insert:hover { background:#1b222c; }
+    .color-insert:focus-within { border-color:rgba(91,216,245,.38); }
+    .toolbar-custom-color { display:inline-flex; align-items:center; justify-content:center; width:27px; flex:0 0 27px; border:0; background:transparent; cursor:pointer; }
+    .toolbar-color-wheel { display:block; width:23px; height:23px; padding:2px; border:0; background:transparent; cursor:pointer; }
     .toolbar-color-wheel::-webkit-color-swatch-wrapper { padding:0; }
     .toolbar-color-wheel::-webkit-color-swatch { border:0; border-radius:4px; }
-    .toolbar-insert-color { color: var(--accent); }
+    .toolbar-color-wheel::-moz-color-swatch { border:0; border-radius:4px; }
+    .toolbar-insert-color { display:inline-flex; align-items:center; justify-content:center; width:24px; flex:0 0 24px; padding:0; border:0; border-left:1px solid rgba(255,255,255,.08); background:transparent; color:var(--accent); cursor:pointer; transition:background .16s ease, color .16s ease; }
+    .toolbar-insert-color svg { width:14px; height:14px; }
+    .toolbar-insert-color:hover { background:rgba(91,216,245,.14); color:#fff; }
+    .toolbar-insert-color:focus-visible { outline:2px solid rgba(66,212,245,.55); outline-offset:-2px; }
     .palette-trigger { border-color: rgba(255,255,255,.06); background: rgba(255,255,255,.035); }
     .palette-tools-stack { display: flex; flex-direction: row; align-items: center; gap: 3px; }
     .palette-tools-stack > button {
@@ -1557,11 +1565,7 @@
       </div>
       <div class="top-actions">
         <span id="saveStatus" class="save-status unsaved" role="status" aria-live="polite" aria-label="Chưa lưu" title="Chưa lưu">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 3h11l3 3v15H5z"/>
-            <path d="M8 3v6h8V3"/>
-            <path d="M8 21v-7h8v7"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
         </span>
         <details class="top-more">
           <summary class="icon-btn" aria-label="Tùy chọn khác" title="Tùy chọn khác">
@@ -1656,8 +1660,10 @@
             </span>
             <select id="sharedSyntaxSelect" class="select syntax-select" aria-label="Cú pháp chèn" title="Cú pháp chèn"><option value="legacy">Legacy &amp;</option><option value="section">Raw §</option><option value="mini">MiniMessage &lt;&gt;</option><option value="iridium">IridiumColorAPI</option><option value="bukkit">Bukkit &amp;x hex</option></select>
             <div id="sharedColorToolbar" class="toolbar-group" aria-label="Bộ chọn màu"></div>
-            <label class="toolbar-custom-color" title="Chọn màu mới" aria-label="Chọn màu tùy ý"><input id="toolbarCustomColor" class="toolbar-color-wheel" type="color" value="#42D4F5" aria-label="Chọn màu tùy ý"></label>
-            <button id="insertCustomColor" class="code-btn toolbar-insert-color" type="button" title="Chèn màu đang chọn" aria-label="Chèn màu đang chọn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12"/><path d="m6 10 6 6 6-6"/><path d="M5 20h14"/></svg></button>
+            <div class="color-insert" id="customColorInsert">
+              <label class="toolbar-custom-color" title="Chọn màu mới" aria-label="Chọn màu tùy ý"><input id="toolbarCustomColor" class="toolbar-color-wheel" type="color" value="#42D4F5" aria-label="Chọn màu tùy ý"></label>
+              <button id="insertCustomColor" class="toolbar-insert-color" type="button" title="Chèn màu đang chọn" aria-label="Chèn màu đang chọn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12"/><path d="m6 10 6 6 6-6"/><path d="M5 20h14"/></svg></button>
+            </div>
             <div id="sharedFormatToolbar" class="toolbar-group toolbar-format" aria-label="Bộ định dạng"></div>
             <div id="sharedAlignmentToolbar" class="alignment-toolbar" aria-label="Căn dòng MOTD"></div>
           </div>
@@ -3567,13 +3573,22 @@ Ví dụ: &b&lWelcome
         return normalizeLinebreaks(raw);
       }
 
+      // Exact 16-colour match only (no nearest-colour rounding); used where RGB is allowed but classic codes are preferred.
+      function exactLegacyCode(hex) {
+        const target = cleanHex(hex).toUpperCase();
+        const match = colors.find((color) => color.category === "Vanilla" && color.legacy && color.hex.toUpperCase() === target);
+        return match ? match.legacy : null;
+      }
+
       function serializeTokensToLegacy(tokens, mode = "legacy") {
         tokens = expandGradientTokens(tokens);
         const output = [];
         let currentColor = null;
         let currentStyles = { obfuscated: false, bold: false, strikethrough: false, underline: false, italic: false };
         const prefix = mode === "section" ? "§" : "&";
-        const getColor = (token) => mode === "bukkit" ? ampX(token.color) : mode === "section" ? sectionColorCode(token.color) : nearestLegacy(token.color);
+        const getColor = (token) => mode === "bukkit" ? ampX(token.color)
+          : mode === "slp" ? (exactLegacyCode(token.color) || ampX(token.color))
+          : mode === "section" ? sectionColorCode(token.color) : nearestLegacy(token.color);
         const styleKeys = ["obfuscated", "bold", "strikethrough", "underline", "italic"];
         for (const token of tokens) {
           if (token.linebreak) { output.push("\n"); currentColor = null; currentStyles = { obfuscated: false, bold: false, strikethrough: false, underline: false, italic: false }; continue; }
@@ -3718,6 +3733,9 @@ Ví dụ: &b&lWelcome
         if (source === "plain" && tokens.every((token) => token.linebreak || (token.color === "#FFFFFF" && !token.grad && STYLE_KEYS.every((key) => !token[key])))) {
           return target === "mini" ? escapeMini(normalized).replace(/\n/g, "<newline>") : normalized;
         }
+        // ServerListPlus (v3.5.0+) understands &c codes and RGB as &x&r&r&g&g&b&b / &#rrggbb:
+        // keep classic codes where the colour is exact and RGB (gradients included) everywhere else.
+        if (target === "slp") return source === "legacy" || source === "bukkit" ? normalized : serializeTokensToLegacy(tokens, "slp");
         if (target === "mini") return serializeTokensToMini(tokens);
         if (target === "iridium") return serializeTokensToIridium(tokens);
         if (target === "section") return serializeTokensToLegacy(tokens, "section");
@@ -4022,22 +4040,19 @@ Ví dụ: &b&lWelcome
         const source = normalizeLinebreaks(raw);
         const lines = source.split("\n").slice(0, 2);
         while (lines.length < 2) lines.push("");
+        // ServerListPlus.yml is a multi-document file; the status section is the document tagged
+        // "--- !Status", whose top-level keys are Default / Personalized (there is no "Status:" key).
+        // A list under Description means random rotation; one entry = one fixed MOTD.
+        const head = ["--- !Status", "Default:", "  Description:"];
         // A YAML block scalar auto-detects indentation from its first line, so leading
         // alignment spaces would be swallowed. A quoted scalar keeps them intact.
         if (lines.some((line) => /^ /.test(line))) {
-          return [
-            "Status:",
-            "  Default:",
-            "    Description:",
-            `    - "${yamlDoubleQuoted(lines.join("\n"))}"`
-          ].join("\n");
+          return [...head, `  - "${yamlDoubleQuoted(lines.join("\n"))}"`].join("\n");
         }
         return [
-          "Status:",
-          "  Default:",
-          "    Description:",
-          "    - |-",
-          ...lines.map((line) => `      ${line}`)
+          ...head,
+          "  - |-",
+          ...lines.map((line) => (line ? `    ${line}` : ""))
         ].join("\n");
       }
 
@@ -4195,7 +4210,7 @@ Ví dụ: &b&lWelcome
         const serverProperties = `motd=${legacyToServerProperties(tokens)}`;
         const velocity = `motd = "${tomlQuoted(mini)}"`;
         const bungee = `motd: "${yamlDoubleQuoted(legacy)}"`;
-        const serverListPlus = buildServerListPlusOutput(legacy);
+        const serverListPlus = buildServerListPlusOutput(serializeForTarget(normalized, tokens, "slp"));
         return [
           ["server.properties", serverProperties, `Vanilla / Paper · ${outputNewlineInfo(serverProperties, "escaped\n")}`],
           ["velocity.toml", velocity, `Velocity · ${outputNewlineInfo(velocity, "escaped\n")}`],
