@@ -1350,6 +1350,25 @@
     .tabs-tools { align-items: center; }
     .top-more .icon-btn { background: rgba(255,255,255,.035); }
     .editor-rail.is-hidden { display: none; }
+
+    /* Scroll hints: ‹ › arrows appear only while the toolbar rail actually overflows. */
+    .editor-rail-wrap { position: relative; min-width: 0; }
+    .editor-rail-wrap.is-hidden { display: none; }
+    .rail-arrow {
+      position: absolute; top: 1px; bottom: 0; z-index: 4; width: 30px; padding: 0;
+      display: inline-flex; align-items: center; cursor: pointer;
+      border: 0; color: var(--accent); background: transparent;
+      opacity: 0; visibility: hidden;
+      transition: opacity .16s ease, visibility 0s linear .16s;
+    }
+    .rail-arrow svg { width: 16px; height: 16px; flex: 0 0 auto; filter: drop-shadow(0 0 4px rgba(66,212,245,.35)); }
+    .rail-arrow-left { left: 0; justify-content: flex-start; padding-left: 4px; background: linear-gradient(90deg, #090d13 45%, rgba(9,13,19,0)); }
+    .rail-arrow-right { right: 0; justify-content: flex-end; padding-right: 4px; background: linear-gradient(270deg, #090d13 45%, rgba(9,13,19,0)); }
+    .rail-arrow:hover svg, .rail-arrow:focus-visible svg { color: #fff; transform: scale(1.12); }
+    .rail-arrow:focus-visible { outline: 2px solid rgba(66,212,245,.55); outline-offset: -2px; }
+    .editor-rail-wrap.can-scroll-left .rail-arrow-left,
+    .editor-rail-wrap.can-scroll-right .rail-arrow-right { opacity: 1; visibility: visible; transition-delay: 0s; }
+    @media (prefers-reduced-motion: reduce) { .rail-arrow { transition: none; } .rail-arrow svg { transition: none; } }
     .alignment-toolbar {
       display: flex; align-items: center; gap: 4px; margin-left: 4px; padding-left: 8px;
       border-left: 1px solid rgba(255,255,255,.06);
@@ -1627,6 +1646,9 @@
             </div>
           </div>
 
+          <div class="editor-rail-wrap" id="editorRailWrap">
+          <button id="railScrollLeft" class="rail-arrow rail-arrow-left" type="button" tabindex="-1" aria-label="Cuộn sang trái" title="Cuộn sang trái"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg></button>
+          <button id="railScrollRight" class="rail-arrow rail-arrow-right" type="button" tabindex="-1" aria-label="Cuộn sang phải" title="Cuộn sang phải"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></button>
           <div class="editor-rail">
             <span class="toolbar-label">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19 19 4"/><path d="M7 4h5M12 19h5"/></svg>
@@ -1638,6 +1660,7 @@
             <button id="insertCustomColor" class="code-btn toolbar-insert-color" type="button" title="Chèn màu đang chọn" aria-label="Chèn màu đang chọn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12"/><path d="m6 10 6 6 6-6"/><path d="M5 20h14"/></svg></button>
             <div id="sharedFormatToolbar" class="toolbar-group toolbar-format" aria-label="Bộ định dạng"></div>
             <div id="sharedAlignmentToolbar" class="alignment-toolbar" aria-label="Căn dòng MOTD"></div>
+          </div>
           </div>
         </div>
 
@@ -1955,7 +1978,7 @@ Ví dụ: &b&lWelcome
             paletteHint: "Click màu để chèn · hiện tại: {syntax}", searchColors: "Tìm màu hoặc &code…", searchAria: "Tìm màu",
             insertionSyntax: "Cú pháp chèn", colorPicker: "Chọn màu tùy ý", insertColor: "Chèn màu đang chọn", customHex: "Hex màu tùy ý", customColor: "Màu tùy ý",
             insert: "Chèn", copyHex: "Copy hex", filterGroups: "Lọc nhóm màu", tools: "Công cụ", color: "Màu",
-            formatToolbar: "Bộ định dạng", colorToolbar: "Bộ chọn màu", alignmentToolbar: "Căn dòng MOTD", alignLeft: "Căn trái", alignCenter: "Căn giữa", alignRight: "Căn phải", live: "Live",
+            formatToolbar: "Bộ định dạng", colorToolbar: "Bộ chọn màu", alignmentToolbar: "Căn dòng MOTD", scrollLeft: "Cuộn sang trái", scrollRight: "Cuộn sang phải", alignLeft: "Căn trái", alignCenter: "Căn giữa", alignRight: "Căn phải", live: "Live",
             generator: "MOTD Generator", editor: "MOTD Editor", notes: "Format Notes", about: "Giới thiệu",
             formatShowcase: "Giới thiệu format", noPreset: "No preset", starterPreset: "Preset: starter", examplePreset: "Preset: example", helpPreset: "Preset: help line", whisperPreset: "Preset: whisper format", statusPreset: "Preset: status states",
             presetMotd: "Preset MOTD", presetUniversal: "Preset universal editor",
@@ -2023,7 +2046,7 @@ Ví dụ: &b&lWelcome
             paletteHint: "Click a color to insert · current: {syntax}", searchColors: "Search colors or &code…", searchAria: "Search colors",
             insertionSyntax: "Insertion syntax", colorPicker: "Pick custom color", insertColor: "Insert selected color", customHex: "Custom color hex", customColor: "Custom color",
             insert: "Insert", copyHex: "Copy hex", filterGroups: "Filter color groups", tools: "Tools", color: "Color",
-            formatToolbar: "Formatting toolbar", colorToolbar: "Color picker", alignmentToolbar: "MOTD line alignment", alignLeft: "Align left", alignCenter: "Align center", alignRight: "Align right", live: "Live",
+            formatToolbar: "Formatting toolbar", colorToolbar: "Color picker", alignmentToolbar: "MOTD line alignment", scrollLeft: "Scroll left", scrollRight: "Scroll right", alignLeft: "Align left", alignCenter: "Align center", alignRight: "Align right", live: "Live",
             generator: "MOTD Generator", editor: "MOTD Editor", notes: "Format Notes", about: "About",
             formatShowcase: "Format showcase", noPreset: "No preset", starterPreset: "Preset: starter", examplePreset: "Preset: example", helpPreset: "Preset: help line", whisperPreset: "Preset: whisper format", statusPreset: "Preset: status states",
             presetMotd: "MOTD preset", presetUniversal: "Universal editor preset",
@@ -2372,6 +2395,8 @@ Ví dụ: &b&lWelcome
         setAttr("#search", "placeholder", t("labels.searchColors")); setAttr("#search", "aria-label", t("labels.searchAria"));
         setAttr("#categoryChips", "aria-label", t("labels.filterGroups"));
         setAttr(".tabs", "aria-label", t("labels.tools"));
+        setAttr("#railScrollLeft", "aria-label", t("labels.scrollLeft")); setAttr("#railScrollLeft", "title", t("labels.scrollLeft"));
+        setAttr("#railScrollRight", "aria-label", t("labels.scrollRight")); setAttr("#railScrollRight", "title", t("labels.scrollRight"));
         setAttr("#toolbarCustomColor", "aria-label", t("labels.colorPicker"));
         setAttr(".toolbar-custom-color", "title", t("labels.colorPicker"));
         setAttr("#insertCustomColor", "title", t("labels.insertColor")); setAttr("#insertCustomColor", "aria-label", t("labels.insertColor"));
@@ -4458,6 +4483,39 @@ Ví dụ: &b&lWelcome
         if (!collapsed && document.readyState !== "loading") requestAnimationFrame(() => dom.search.focus());
       }
 
+      /* Toolbar scroll hints: show ‹ › only while the rail overflows, and only on the side that has more. */
+      function updateRailScrollHints() {
+        const wrap = $("#editorRailWrap");
+        const rail = wrap?.querySelector(".editor-rail");
+        if (!wrap || !rail) return;
+        const max = rail.scrollWidth - rail.clientWidth;
+        wrap.classList.toggle("can-scroll-left", max > 1 && rail.scrollLeft > 1);
+        wrap.classList.toggle("can-scroll-right", max > 1 && rail.scrollLeft < max - 1);
+      }
+
+      function initRailScrollHints() {
+        const wrap = $("#editorRailWrap");
+        const rail = wrap?.querySelector(".editor-rail");
+        if (!wrap || !rail) return;
+        const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+        const scrollByPage = (direction) => rail.scrollBy({
+          left: direction * Math.max(120, Math.round(rail.clientWidth * 0.7)),
+          behavior: reduceMotion?.matches ? "auto" : "smooth"
+        });
+        $("#railScrollLeft")?.addEventListener("click", () => scrollByPage(-1));
+        $("#railScrollRight")?.addEventListener("click", () => scrollByPage(1));
+        rail.addEventListener("scroll", updateRailScrollHints, { passive: true });
+        window.addEventListener("resize", updateRailScrollHints);
+        if ("ResizeObserver" in window) {
+          const observer = new ResizeObserver(updateRailScrollHints);
+          const watch = () => { observer.disconnect(); observer.observe(rail); Array.from(rail.children).forEach((child) => observer.observe(child)); };
+          watch();
+          // The colour / format / alignment groups are re-rendered with innerHTML (and language changes relabel them).
+          new MutationObserver(() => { watch(); updateRailScrollHints(); }).observe(rail, { childList: true, subtree: true });
+        }
+        updateRailScrollHints();
+      }
+
       function activateTab(viewId, persist = true) {
         $$(".tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.view === viewId));
         $$(".view-menu-item").forEach((item) => item.classList.toggle("active", item.dataset.view === viewId));
@@ -4465,7 +4523,10 @@ Ví dụ: &b&lWelcome
         updateAlignmentToolbar();
         requestAnimationFrame(handleViewportChange);
         const rail = $(".editor-rail");
-        if (rail) rail.classList.toggle("is-hidden", viewId === "formatView" || viewId === "aboutView");
+        const railHidden = viewId === "formatView" || viewId === "aboutView";
+        if (rail) rail.classList.toggle("is-hidden", railHidden);
+        $("#editorRailWrap")?.classList.toggle("is-hidden", railHidden);
+        requestAnimationFrame(updateRailScrollHints);
         if (viewId === "aboutView") loadReleaseInfo();
         if (persist) {
           localStorage.setItem(STORAGE_KEYS.activeTab, viewId);
@@ -4854,6 +4915,7 @@ Ví dụ: &b&lWelcome
       wireEvents();
       bindPersistedDetails();
       renderSharedToolbar();
+      initRailScrollHints();
       updateAlignmentToolbar();
 
       if (localStorage.getItem(STORAGE_KEYS.lastSaved)) {
