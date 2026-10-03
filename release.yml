@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tag must match APP_VERSION in index.html
+        run: |
+          APP=$(grep -oP 'const APP_VERSION = "\K[^"]+' index.html)
+          if [ "$APP" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match APP_VERSION $APP in index.html"
+            exit 1
+          fi
+
+      - name: Release notes come from CHANGELOG.md
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          awk -v v="$VER" '
+            $0 ~ "^## \\[" v "\\]" { found=1; next }
+            /^## \[/ { found=0 }
+            found
+          ' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then
+            echo "::error::No '## [$VER]' section in CHANGELOG.md"
+            exit 1
+          fi
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" index.html \
+            --title "MOTD Lab $GITHUB_REF_NAME" \
+            --notes-file notes.md

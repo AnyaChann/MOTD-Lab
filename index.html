@@ -2018,7 +2018,7 @@ Ví dụ: &b&lWelcome
             saveUnchanged: "Chưa lưu", saveSaving: "Đang lưu…", saveTime: "Đã lưu lúc {time}", dirty: "● Chưa lưu",
             noDataSave: "Không có dữ liệu để lưu", saveFailed: "Lưu thất bại — kiểm tra storage của trình duyệt", noSaved: "Không có dữ liệu đã lưu", loadFailed: "Không thể tải dữ liệu đã lưu",
             resetDone: "Đã xóa và reset", noContent: "Không có nội dung để xóa", motdCleared: "Đã xóa nội dung MOTD", contentCleared: "Đã xóa nội dung",
-            serverAddressRequired: "Nhập địa chỉ server trước", pinging: "Đang ping server…", serverOffline: "Server offline hoặc không phản hồi — snapshot vẫn được giữ", pingImported: "Đã ping và import MOTD", pingFailed: "Không import được — kiểm tra Console hoặc địa chỉ server",
+            serverAddressRequired: "Nhập địa chỉ server trước", pinging: "Đang ping server…", serverOffline: "Server offline hoặc không phản hồi — snapshot vẫn được giữ", pingImported: "Đã ping và import MOTD", pingFailed: "Không import được — kiểm tra Console hoặc địa chỉ server", pingTimeout: "Server không phản hồi kịp (quá 10 giây)",
             onlyPng: "Chỉ nhận PNG", iconTooLarge: "Icon không được vượt quá 2MB", iconLoaded: "Đã tải server icon", iconProcessFailed: "Không thể xử lý ảnh này", iconReadFailed: "Không thể đọc file PNG",
             copied: "Đã copy: {value}", progressSaved: "Đã lưu tiến trình",
             nativeInput: "Giữ nguyên input gốc", conversionUniversal: "Chuyển đổi từ input universal",
@@ -2044,7 +2044,7 @@ Ví dụ: &b&lWelcome
             f3Title: "Lấy MOTD từ server", f3: "Nhập địa chỉ server để ping, nhập sẵn MOTD, icon, version và số người chơi vào trình chỉnh sửa.",
             f4Title: "Soạn nhanh, ít thao tác", f4: "Bảng mã màu, căn dòng, undo/redo, preset và Input Preview giúp nhìn ra mỗi tag ảnh hưởng đến đoạn chữ nào.",
             releaseTitle: "Phiên bản", changelog: "Lịch sử thay đổi ↗",
-            relLoading: "Đang kiểm tra GitHub…", relLive: "Từ GitHub Releases", relNone: "Chưa có release trên GitHub", relFallback: "Không kết nối được GitHub · dùng số đã ghi",
+            relLoading: "Đang kiểm tra GitHub…", relCurrent: "Đang là bản mới nhất", relUpdate: "Có bản mới: {version}", relAhead: "Mới hơn release mới nhất ({version})", relUnknown: "Release mới nhất: {version}", relNone: "Chưa có release trên GitHub", relFallback: "Không kết nối được GitHub · không kiểm tra được bản mới",
             privacyTitle: "Dữ liệu của bạn",
             privacy: "Nội dung bạn soạn chỉ được lưu trong localStorage của trình duyệt này, không cần tài khoản. Chức năng Ping & import gửi địa chỉ server bạn nhập tới api.mcstatus.io. Khi bạn mở trang Giới thiệu, trang cũng hỏi api.github.com để biết bản phát hành mới nhất; không có nội dung nào bạn soạn được gửi đi."
           }
@@ -2086,7 +2086,7 @@ Ví dụ: &b&lWelcome
             saveUnchanged: "Not saved", saveSaving: "Saving…", saveTime: "Saved at {time}", dirty: "● Not saved",
             noDataSave: "Nothing to save", saveFailed: "Save failed — check browser storage", noSaved: "No saved data", loadFailed: "Could not load saved data",
             resetDone: "Cleared and reset", noContent: "No content to clear", motdCleared: "Cleared MOTD content", contentCleared: "Cleared content",
-            serverAddressRequired: "Enter a server address first", pinging: "Pinging server…", serverOffline: "Server offline or unresponsive — snapshot kept", pingImported: "Pinged and imported MOTD", pingFailed: "Import failed — check the console or server address",
+            serverAddressRequired: "Enter a server address first", pinging: "Pinging server…", serverOffline: "Server offline or unresponsive — snapshot kept", pingImported: "Pinged and imported MOTD", pingFailed: "Import failed — check the console or server address", pingTimeout: "The server did not respond in time (10 s)",
             onlyPng: "PNG only", iconTooLarge: "Icon must be under 2MB", iconLoaded: "Server icon loaded", iconProcessFailed: "Could not process this image", iconReadFailed: "Could not read PNG file",
             copied: "Copied: {value}", progressSaved: "Progress saved",
             nativeInput: "Native input preserved", conversionUniversal: "Converted from universal input",
@@ -2112,7 +2112,7 @@ Ví dụ: &b&lWelcome
             f3Title: "Get MOTD from server", f3: "Enter a server address to ping it and load its MOTD, icon, version and player count into the editor.",
             f4Title: "Fast to write", f4: "Color codes, alignment, undo/redo, presets and Input Preview show which text each tag affects.",
             releaseTitle: "Version", changelog: "Changelog ↗",
-            relLoading: "Checking GitHub…", relLive: "From GitHub Releases", relNone: "No GitHub release yet", relFallback: "Can't reach GitHub · showing built-in value",
+            relLoading: "Checking GitHub…", relCurrent: "Up to date", relUpdate: "Update available: {version}", relAhead: "Newer than the latest release ({version})", relUnknown: "Latest release: {version}", relNone: "No GitHub release yet", relFallback: "Can't reach GitHub · couldn't check for updates",
             privacyTitle: "Your data",
             privacy: "What you write is stored only in this browser's localStorage, with no account needed. Ping & import sends the server address you enter to api.mcstatus.io. When you open the About page, it also asks api.github.com for the latest release; nothing you write is sent."
           }
@@ -2212,7 +2212,26 @@ Ví dụ: &b&lWelcome
       const APP_REPO = "AnyaChann/MOTD-Lab";
       const APP_VERSION = "v1.0.0";
       const APP_RELEASE_DATE = "2026-10-02";
-      const releaseInfo = { state: "fallback", version: APP_VERSION, date: APP_RELEASE_DATE, url: `https://github.com/${APP_REPO}/releases`, loading: false, lastTry: 0 };
+      // APP_VERSION / APP_RELEASE_DATE describe THIS file. They are the single source of truth:
+      // the release workflow refuses to publish a tag that differs from APP_VERSION.
+      // `latest` is only the newest GitHub release, used to tell the user an update exists.
+      const releaseInfo = { state: "fallback", latest: null, url: `https://github.com/${APP_REPO}/releases`, loading: false, lastTry: 0 };
+
+      function parseSemver(value) {
+        const m = /^v?(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?/.exec(String(value || "").trim());
+        return m ? { nums: [Number(m[1]), Number(m[2]), Number(m[3])], pre: m[4] || "" } : null;
+      }
+
+      // -1: a < b, 0: equal, 1: a > b, null: not comparable. A pre-release sorts below its release.
+      function compareVersions(a, b) {
+        const x = parseSemver(a), y = parseSemver(b);
+        if (!x || !y) return null;
+        for (let i = 0; i < 3; i++) if (x.nums[i] !== y.nums[i]) return x.nums[i] < y.nums[i] ? -1 : 1;
+        if (x.pre === y.pre) return 0;
+        if (!x.pre) return 1;
+        if (!y.pre) return -1;
+        return x.pre < y.pre ? -1 : 1;
+      }
 
       function formatReleaseDate(value) {
         const d = new Date(value);
@@ -2223,17 +2242,22 @@ Ví dụ: &b&lWelcome
       function renderReleaseInfo() {
         const version = document.getElementById("aboutVersion");
         if (!version) return;
-        version.textContent = releaseInfo.version;
-        document.getElementById("aboutReleaseDate").textContent = formatReleaseDate(releaseInfo.date);
+        version.textContent = APP_VERSION;
+        document.getElementById("aboutReleaseDate").textContent = formatReleaseDate(APP_RELEASE_DATE);
         document.getElementById("aboutChangelog").href = releaseInfo.url;
         const pill = document.getElementById("aboutReleaseStatus");
-        const map = {
-          loading: ["loading", "relLoading"], live: ["success", "relLive"],
-          none: ["offline", "relNone"], fallback: ["offline", "relFallback"]
-        };
-        const [dataState, key] = map[releaseInfo.state] || map.fallback;
+        const cmp = releaseInfo.state === "live" ? compareVersions(releaseInfo.latest, APP_VERSION) : null;
+        let dataState = "offline", key = "relFallback";
+        if (releaseInfo.state === "loading") { dataState = "loading"; key = "relLoading"; }
+        else if (releaseInfo.state === "none") key = "relNone";
+        else if (releaseInfo.state === "live") {
+          if (cmp === 1) { dataState = "error"; key = "relUpdate"; }
+          else if (cmp === 0) { dataState = "success"; key = "relCurrent"; }
+          else if (cmp === -1) { dataState = "offline"; key = "relAhead"; }
+          else { dataState = "offline"; key = "relUnknown"; }
+        }
         pill.dataset.state = dataState;
-        pill.textContent = I18N[language].about[key];
+        pill.textContent = I18N[language].about[key].replace("{version}", releaseInfo.latest || "");
       }
 
       async function loadReleaseInfo() {
@@ -2256,8 +2280,7 @@ Ví dụ: &b&lWelcome
           } else {
             const data = await res.json();
             if (!data.tag_name) throw new Error("No tag_name");
-            releaseInfo.version = String(data.tag_name).slice(0, 40);
-            releaseInfo.date = data.published_at || data.created_at || APP_RELEASE_DATE;
+            releaseInfo.latest = String(data.tag_name).slice(0, 40);
             const prefix = `https://github.com/${APP_REPO}/`;
             releaseInfo.url = typeof data.html_url === "string" && data.html_url.startsWith(prefix) ? data.html_url : `https://github.com/${APP_REPO}/releases`;
             releaseInfo.state = "live";
@@ -2299,7 +2322,6 @@ Ví dụ: &b&lWelcome
         outputColorFormats: "2c2t_outputColorFormats"
       };
 
-      const MC_CODE_TOKEN_RE = /[&§]x([&§][0-9a-f]){6}|[&§][0-9a-fk-or]|./gis;
       const HISTORY_LIMIT = 80;
       const MC_MOTD_LINE_WIDTH = 130;
       const OBFUSCATED_CHARSET = "!@#$%^&*()_+-=[]{}|;:,.<>?/~ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -3209,10 +3231,12 @@ Ví dụ: &b&lWelcome
               const body = closing ? inner.slice(1) : inner;
               const name = body.split(":")[0].toLowerCase().trim();
 
+              // Iridium compiles <SOLID>/<GRADIENT>/<RAINBOW> to §x§r§r§g§g§b§b, and a colour code clears
+              // bold/italic/etc. (as the #{hex} form above already does), so none of them inherit formatting.
               if (!closing && name === "solid") {
                 const hex = body.split(":")[1] || "";
                 if (/^[0-9a-fA-F]{6}$/.test(hex)) {
-                  beginPersistent(rawTag, "iridium-solid", i, end + 1, { ...style, color: `#${hex.toUpperCase()}`, gradId: null });
+                  beginPersistent(rawTag, "iridium-solid", i, end + 1, { ...defaultStyle(), color: `#${hex.toUpperCase()}`, gradId: null });
                   i = end + 1;
                   continue;
                 }
@@ -3221,7 +3245,7 @@ Ví dụ: &b&lWelcome
                 const stops = parseGradientStops(body.split(":").slice(1));
                 if (stops.length) {
                   const avg = averageHex(stops).toUpperCase();
-                  beginPaired(rawTag, "iridium-gradient", i, end + 1, "iridium-gradient", { ...style, color: avg, gradId: nextControlId });
+                  beginPaired(rawTag, "iridium-gradient", i, end + 1, "iridium-gradient", { ...defaultStyle(), color: avg, gradId: nextControlId });
                   controls[controls.length - 1].gradient = { type: "gradient", stops, avg };
                   i = end + 1;
                   continue;
@@ -3234,7 +3258,7 @@ Ví dụ: &b&lWelcome
                 const rainbowArgs = body.split(":").slice(1);
                 const phase = parseFloat(rainbowArgs.find((part) => /^-?\d*\.?\d+$/.test(part)));
                 const strength = Number.isFinite(level) ? Math.min(Math.max(level, 0), 1) : 1;
-                beginPaired(rawTag, "iridium-rainbow", i, end + 1, "iridium-rainbow", { ...style, color: "#FF55FF", gradId: nextControlId });
+                beginPaired(rawTag, "iridium-rainbow", i, end + 1, "iridium-rainbow", { ...defaultStyle(), color: "#FF55FF", gradId: nextControlId });
                 controls[controls.length - 1].gradient = { type: "rainbow", saturation: strength, value: strength, phase: Number.isFinite(phase) ? phase : 0, reverse: rainbowArgs.includes("!"), avg: "#FF55FF" };
                 i = end + 1;
                 continue;
@@ -3388,18 +3412,22 @@ Ví dụ: &b&lWelcome
         return String(text).replace(/\S/g, () => OBFUSCATED_CHARSET[Math.floor(Math.random() * OBFUSCATED_CHARSET.length)]);
       }
 
-      function renderStyledSpan(token) {
-        const style = `font-weight:${token.bold ? 800 : 400};font-style:${token.italic ? "italic" : "normal"};text-decoration:none`;
-        const chars = Array.from(token.text || "");
-        if (!chars.length) return "";
-        return chars.map((char, index) => {
-          const width = charPixelWidth(char, token.bold);
-          const glyphStyle = `color:${token.grad ? gradientColorAt(token, index) : token.color};${style};--mc-width:${width}`;
-          const displayChar = token.obfuscated ? randomizeText(char) : char;
-          const obfClass = token.obfuscated ? " obf-text" : "";
-          return `<span class="editor-glyph${obfClass}${decorationClasses(token)}" style="${glyphStyle}" data-original="${token.obfuscated ? escapeHtml(char) : ""}">${escapeHtml(displayChar)}</span>`;
-        }).join("");
+      // Single token -> glyph HTML path, shared by the editor preview and the server-list
+      // preview. `baseClass` only selects the sizing rules in CSS (editor-glyph / motd-glyph);
+      // colour (including per-character gradient), weight, decoration, width and obfuscation
+      // are all decided here, so a fix to any of them applies to both previews at once.
+      function glyphHtml(char, token, index, baseClass) {
+        const style = `color:${gradientColorAt(token, index)};font-weight:${token.bold ? 800 : 400};font-style:${token.italic ? "italic" : "normal"};text-decoration:none;--mc-width:${charPixelWidth(char, token.bold)}`;
+        const cls = `${baseClass}${token.obfuscated ? " obf-text" : ""}${decorationClasses(token)}`;
+        if (token.obfuscated) return `<span class="${cls}" style="${style}" data-original="${escapeHtml(char)}">${escapeHtml(randomizeText(char))}</span>`;
+        return `<span class="${cls}" style="${style}">${escapeHtml(char)}</span>`;
       }
+
+      function renderGlyphRun(token, baseClass) {
+        return Array.from(token.text || "").map((char, index) => glyphHtml(char, token, index, baseClass)).join("");
+      }
+
+      function renderStyledSpan(token) { return renderGlyphRun(token, "editor-glyph"); }
 
       function miniFormat(text, format) {
         const tags = [["obfuscated", "obf"], ["bold", "b"], ["strikethrough", "st"], ["underline", "u"], ["italic", "i"]];
@@ -3994,18 +4022,6 @@ Ví dụ: &b&lWelcome
         return bold ? width + MC_BOLD_EXTRA_WIDTH : width;
       }
 
-      function textPixelWidth(line) {
-        let width = 0;
-        let bold = false;
-        for (const token of line.match(MC_CODE_TOKEN_RE) || []) {
-          if (/^[&§]x([&§][0-9a-f]){6}$/i.test(token) || /^[&§][0-9a-f]$/i.test(token) || /^[&§]r$/i.test(token)) { bold = false; continue; }
-          if (/^[&§]l$/i.test(token)) { bold = true; continue; }
-          if (/^[&§][konm]$/i.test(token)) continue;
-          width += charPixelWidth(token, bold);
-        }
-        return width;
-      }
-
       function splitTokenLines(tokens) {
         const lines = [[]];
         for (const token of tokens) {
@@ -4019,19 +4035,7 @@ Ví dụ: &b&lWelcome
         return tokens.map((token) => token.text).join("");
       }
 
-      function renderMotdGlyph(char, style, index = 0) {
-        const width = charPixelWidth(char, style.bold);
-        const baseStyle = `color:${style.grad ? gradientColorAt(style, index) : style.color};font-weight:${style.bold ? 800 : 400};font-style:${style.italic ? "italic" : "normal"};text-decoration:none;--mc-width:${width}`;
-        const decoClass = decorationClasses(style);
-        if (style.obfuscated) {
-          return `<span class="motd-glyph obf-text${decoClass}" style="${baseStyle}" data-original="${escapeHtml(char)}">${escapeHtml(randomizeText(char))}</span>`;
-        }
-        return `<span class="motd-glyph${decoClass}" style="${baseStyle}">${escapeHtml(char)}</span>`;
-      }
-
-      function renderMotdToken(token) {
-        return Array.from(token.text || "").map((char, index) => renderMotdGlyph(char, token, index)).join("");
-      }
+      function renderMotdToken(token) { return renderGlyphRun(token, "motd-glyph"); }
 
       function renderTokenLine(element, tokens, alignment = "left") {
         element.style.textAlign = "left";
@@ -4318,6 +4322,45 @@ Ví dụ: &b&lWelcome
       /* =========================
          Persistence
       ========================== */
+      /* =========================
+         Storage schema
+         Bump STORAGE_SCHEMA_VERSION when a stored key changes meaning, and add a step below.
+         Data written by a NEWER build is never rewritten or downgraded by an older one.
+      ========================== */
+      const STORAGE_SCHEMA_KEY = "2c2t_schemaVersion";
+      const STORAGE_SCHEMA_VERSION = 1;
+
+      const STORAGE_MIGRATIONS = {
+        // 0 -> 1: the old boolean "2c2t_motdCenter" became motdAlignment; customHex is folded into customColor.
+        1() {
+          if (localStorage.getItem(STORAGE_KEYS.motdAlignment) === null && localStorage.getItem("2c2t_motdCenter") === "true") {
+            localStorage.setItem(STORAGE_KEYS.motdAlignment, "center");
+          }
+          localStorage.removeItem("2c2t_motdCenter");
+          if (localStorage.getItem(STORAGE_KEYS.customColor) === null && localStorage.getItem(STORAGE_KEYS.customHex) !== null) {
+            localStorage.setItem(STORAGE_KEYS.customColor, localStorage.getItem(STORAGE_KEYS.customHex));
+          }
+        }
+      };
+
+      function migrateStorage() {
+        try {
+          const stored = Number.parseInt(localStorage.getItem(STORAGE_SCHEMA_KEY) || "0", 10);
+          const from = Number.isInteger(stored) && stored >= 0 ? stored : 0;
+          if (from > STORAGE_SCHEMA_VERSION) {
+            console.warn(`Saved data uses schema ${from}, newer than this build (${STORAGE_SCHEMA_VERSION}); leaving it untouched.`);
+            return false;
+          }
+          for (let version = from + 1; version <= STORAGE_SCHEMA_VERSION; version++) STORAGE_MIGRATIONS[version]();
+          if (from !== STORAGE_SCHEMA_VERSION) localStorage.setItem(STORAGE_SCHEMA_KEY, String(STORAGE_SCHEMA_VERSION));
+          return true;
+        } catch (error) {
+          // Storage can be unavailable (private mode, quota); the app still works without persistence.
+          console.warn("Storage migration skipped:", error);
+          return false;
+        }
+      }
+
       let saveTimer = null;
       let fullRenderFrame = 0;
       let isDirty = false;
@@ -4616,6 +4659,47 @@ Ví dụ: &b&lWelcome
         else localStorage.removeItem(STORAGE_KEYS.motdIconImage);
       }
 
+      /* =========================
+         Server status API
+         The only code that talks to api.mcstatus.io. Everything else gets either a payload whose
+         shape the renderers rely on, or a ServerStatusError with a stable `kind`.
+      ========================== */
+      const SERVER_STATUS_ENDPOINT = "https://api.mcstatus.io/v2/status/java/";
+      const SERVER_STATUS_TIMEOUT_MS = 10000;
+
+      class ServerStatusError extends Error {
+        constructor(kind, detail = "") {
+          super(detail ? `${kind}: ${detail}` : kind);
+          this.name = "ServerStatusError";
+          this.kind = kind; // "timeout" | "network" | "http" | "shape"
+        }
+      }
+
+      async function fetchServerStatus(address, { timeoutMs = SERVER_STATUS_TIMEOUT_MS, fetchImpl = (...args) => fetch(...args) } = {}) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        const isAbort = (error) => error?.name === "AbortError";
+        try {
+          let response;
+          try {
+            response = await fetchImpl(SERVER_STATUS_ENDPOINT + encodeURIComponent(address), { signal: controller.signal });
+          } catch (error) {
+            throw new ServerStatusError(isAbort(error) ? "timeout" : "network");
+          }
+          if (!response.ok) throw new ServerStatusError("http", String(response.status));
+          let data;
+          try {
+            data = await response.json();
+          } catch (error) {
+            throw new ServerStatusError(isAbort(error) ? "timeout" : "shape", "invalid JSON");
+          }
+          if (!data || typeof data !== "object" || typeof data.online !== "boolean") throw new ServerStatusError("shape", "missing online flag");
+          return data;
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+
       async function importMotdFromServer() {
         if (dom.importBtn?.disabled) return;
         // Chấp nhận cả dạng dán nguyên URL: bỏ giao thức, đường dẫn và khoảng trắng.
@@ -4630,9 +4714,7 @@ Ví dụ: &b&lWelcome
         setImportLoading(true);
         setImportStatus("loading", t("labels.pinging"));
         try {
-          const response = await fetch(`https://api.mcstatus.io/v2/status/java/${encodeURIComponent(address)}`);
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          const data = await response.json();
+          const data = await fetchServerStatus(address);
           lastPingData = data;
           try {
             localStorage.setItem(STORAGE_KEYS.lastPingData, JSON.stringify(data));
@@ -4659,8 +4741,9 @@ Ví dụ: &b&lWelcome
           showToast(t("labels.pingImported"));
         } catch (error) {
           console.warn("Failed to import MOTD:", error);
-          setImportStatus("error", t("labels.pingFailed"));
-          showToast(t("labels.pingFailed"));
+          const message = t(error instanceof ServerStatusError && error.kind === "timeout" ? "labels.pingTimeout" : "labels.pingFailed");
+          setImportStatus("error", message);
+          showToast(message);
         } finally {
           setImportLoading(false);
         }
@@ -4978,6 +5061,7 @@ Ví dụ: &b&lWelcome
       /* =========================
          Boot
       ========================== */
+      migrateStorage();
       applyI18n();
       const storedPaletteState = localStorage.getItem(STORAGE_KEYS.paletteCollapsed);
       setPaletteCollapsed(storedPaletteState !== "false", false);
@@ -5019,6 +5103,16 @@ Ví dụ: &b&lWelcome
 
       installResponsiveObservers();
       setInterval(refreshObfuscatedText, 80);
+      // Test hook: only filled when a test harness creates window.__MOTD_LAB_TEST__ before the page loads.
+      // In normal use the object does not exist, so this does nothing and exposes nothing.
+      if (window.__MOTD_LAB_TEST__) {
+        Object.assign(window.__MOTD_LAB_TEST__, {
+          parseUniversal, detectSourceSyntax, gradientColorAt, charPixelWidth, tokenPixelWidth, splitTokenLines,
+          alignLineString, serializeForTarget, legacyToServerProperties, buildServerListPlusOutput,
+          compareVersions, parseSemver, cleanHex, nearestLegacy, countVisibleText, normalizeLinebreaks,
+          fetchServerStatus, ServerStatusError, migrateStorage, I18N, STORAGE_KEYS, STORAGE_SCHEMA_KEY, STORAGE_SCHEMA_VERSION
+        });
+      }
     })();
   </script>
 </body>

@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MOTD Lab — Minecraft MOTD editor, generator, parser and format reference.">
+  <title>MOTD Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+@@CSS@@
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <h1 class="brand">MOTD Lab</h1>
+      </div>
+      <div class="top-actions">
+        <span id="saveStatus" class="save-status unsaved" role="status" aria-live="polite" aria-label="Chưa lưu" title="Chưa lưu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+        </span>
+        <details class="top-more">
+          <summary class="icon-btn" aria-label="Tùy chọn khác" title="Tùy chọn khác">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+          </summary>
+          <div class="top-more-menu" role="menu">
+            <button id="saveProgress" class="menu-action" type="button" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+              <span id="saveProgressLabel">Lưu ngay</span>
+            </button>
+            <button id="loadProgress" class="menu-action" type="button" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+              <span id="loadProgressLabel">Tải dữ liệu</span>
+            </button>
+            <button id="clearProgress" class="menu-action danger" type="button" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2M19 6l-1 15H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+              <span id="clearProgressLabel">Xóa dữ liệu</span>
+            </button>
+            <button id="openPaletteMenu" class="menu-action" type="button" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c5 0 9 3.2 9 7.3 0 3.1-2.6 5.2-6.1 5.2H13l-1.4 3.1c-.4.9-1.7.9-2.1 0L8 16.3h-.2C4.3 16.3 3 13.5 3 10.4 3 6.3 6.9 3 12 3Z"/></svg>
+              <span id="openPaletteMenuLabel">Mã màu</span>
+            </button>
+            <div class="menu-separator" role="separator"></div>
+            <button class="menu-action view-menu-item" type="button" data-view="formatView" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+              <span class="format-notes-menu-label">Format Notes</span>
+            </button>
+            <button class="menu-action view-menu-item" type="button" data-view="aboutView" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-4.6-9.2-9.1C1.3 8.7 3 5 6.4 5c2 0 3.3 1.1 4.1 2.3.4.5 1.4.5 1.8 0C13.1 6.1 14.4 5 16.4 5c3.4 0 5.1 3.7 3.6 6.9C19 16.4 12 21 12 21Z" transform="translate(0 -.5)"/></svg>
+              <span class="about-menu-label">About</span>
+            </button>
+          </div>
+        </details>
+      </div>
+    </header>
+
+    <section class="workspace-shell">
+      <div id="paletteScrim" class="palette-scrim"></div>
+      <aside id="palette" class="palette collapsed" aria-label="Mã màu Minecraft">
+        <div class="palette-head">
+          <div class="palette-heading">
+            <h2 class="palette-title">Mã màu</h2>
+            <div class="palette-subtitle">Click màu để chèn · hiện tại: <span id="paletteSyntaxLabel">Legacy &amp;</span></div>
+          </div>
+          <button id="togglePalette" class="icon-btn" type="button" aria-expanded="false" aria-label="Đóng mã màu" title="Đóng mã màu">
+            <svg id="paletteToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <div class="palette-body">
+          <div class="stack">
+            <div class="palette-quick-row">
+              
+              <input id="search" class="field" type="search" placeholder="Tìm màu hoặc &amp;code…" aria-label="Tìm màu">
+            </div>
+            <div id="categoryChips" class="filter-row" role="group" aria-label="Lọc nhóm màu"></div>
+
+            <div id="paletteList" class="palette-sections"></div>
+          </div>
+        </div>
+        <div class="palette-footer">
+          <p class="hint">Nút copy trên ô chỉ sao chép hex. Tìm kiếm + nhóm màu chỉ là bộ lọc, không thay đổi format đang chèn.</p>
+        </div>
+      </aside>
+
+      <section class="main">
+        <div class="workspace-head">
+          <div class="tabs-row">
+            <nav class="tabs" aria-label="Công cụ">
+              <button class="tab active" type="button" data-view="motdView">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H4z"/><path d="m8 20 4-4 4 4"/></svg>
+                MOTD Generator
+              </button>
+              <button class="tab" type="button" data-view="textView">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h10M4 19h16"/></svg>
+                MOTD Editor
+              </button>
+            </nav>
+            <div class="tabs-tools">
+              <div class="palette-tools-stack">
+                <button id="languageToggle" class="language-toggle palette-lang" type="button" aria-label="Đổi ngôn ngữ / Switch language" title="Đổi ngôn ngữ / Switch language">VI</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="editor-rail-wrap" id="editorRailWrap">
+          <button id="railScrollLeft" class="rail-arrow rail-arrow-left" type="button" tabindex="-1" aria-label="Cuộn sang trái" title="Cuộn sang trái"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg></button>
+          <button id="railScrollRight" class="rail-arrow rail-arrow-right" type="button" tabindex="-1" aria-label="Cuộn sang phải" title="Cuộn sang phải"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></button>
+          <div class="editor-rail">
+            <span class="toolbar-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19 19 4"/><path d="M7 4h5M12 19h5"/></svg>
+              Màu
+            </span>
+            <select id="sharedSyntaxSelect" class="select syntax-select" aria-label="Cú pháp chèn" title="Cú pháp chèn"><option value="legacy">Legacy &amp;</option><option value="section">Raw §</option><option value="mini">MiniMessage &lt;&gt;</option><option value="iridium">IridiumColorAPI</option><option value="bukkit">Bukkit &amp;x hex</option></select>
+            <div id="sharedColorToolbar" class="toolbar-group" aria-label="Bộ chọn màu"></div>
+            <div class="color-insert" id="customColorInsert">
+              <label class="toolbar-custom-color" title="Chọn màu mới" aria-label="Chọn màu tùy ý"><input id="toolbarCustomColor" class="toolbar-color-wheel" type="color" value="#42D4F5" aria-label="Chọn màu tùy ý"></label>
+              <button id="insertCustomColor" class="toolbar-insert-color" type="button" title="Chèn màu đang chọn" aria-label="Chèn màu đang chọn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12"/><path d="m6 10 6 6 6-6"/><path d="M5 20h14"/></svg></button>
+            </div>
+            <div id="sharedFormatToolbar" class="toolbar-group toolbar-format" aria-label="Bộ định dạng"></div>
+            <div id="sharedAlignmentToolbar" class="alignment-toolbar" aria-label="Căn dòng MOTD"></div>
+          </div>
+          </div>
+        </div>
+
+        <section id="motdView" class="view active">
+          <div class="view-grid">
+            <div class="panel">
+              <div class="panel-head">
+                <h2 class="panel-title">MOTD Generator</h2>
+                <select id="motdPreset" class="select" hidden aria-hidden="true" tabindex="-1" aria-label="Preset MOTD">
+                  <option value="empty">No preset</option>
+                  <option value="starter">Preset: starter</option>
+                  <option value="plain">Preset: example</option>
+                  <option value="fmtLegacy">Legacy &</option>
+                  <option value="fmtSection">Raw §</option>
+                  <option value="fmtBukkit">Bukkit &x</option>
+                  <option value="fmtMini">MiniMessage</option>
+                  <option value="fmtGradient">MiniMessage Gradient</option>
+                  <option value="fmtIridium">IridiumColorAPI</option>
+                </select>
+                <details class="inline-more">
+                  <summary id="motdPresetMenuTrigger" class="btn small menu-trigger">Preset</summary>
+                  <div class="inline-more-menu">
+                    <div class="menu-label">Preset</div>
+                    <div class="menu-actions-grid single">
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="motdPreset" data-preset-value="empty" id="motdPresetEmpty">No preset</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="motdPreset" data-preset-value="starter" id="motdPresetStarter">Preset: starter</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="motdPreset" data-preset-value="plain" id="motdPresetPlain">Preset: example</button>
+                    </div>
+                    <div class="menu-separator" role="separator"></div>
+                    <div class="menu-label format-presets-label">Format showcase</div>
+                    <div class="menu-actions-grid single">
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="motdPreset" data-preset-value="fmtLegacy" id="motdPresetFmtLegacy">Legacy &</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="motdPreset" data-preset-value="fmtSection" id="motdPresetFmtSection">Raw §</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="motdPreset" data-preset-value="fmtBukkit" id="motdPresetFmtBukkit">Bukkit &x</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="motdPreset" data-preset-value="fmtMini" id="motdPresetFmtMini">MiniMessage</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="motdPreset" data-preset-value="fmtGradient" id="motdPresetFmtGradient">MiniMessage Gradient</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="motdPreset" data-preset-value="fmtIridium" id="motdPresetFmtIridium">IridiumColorAPI</button>
+                    </div>
+                  </div>
+                </details>
+              </div>
+              <div class="panel-body">
+                <div class="editor-card">
+                  <textarea id="motdRaw" class="textarea code main-input" spellcheck="false" placeholder="Nhập MOTD tại đây...
+Ví dụ: &b&lWelcome
+&aOnline · &fVersion"></textarea>
+                  <div class="editor-meta">
+                    <div class="editor-meta-left">
+                      <span id="motdLineCounter" class="char-summary"></span>
+                    </div>
+                    <div class="editor-actions">
+                      <button id="undoMotd" class="icon-btn" type="button" title="Undo · Ctrl+Z" aria-label="Undo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 7 7v1"/></svg>
+                      </button>
+                      <button id="redoMotd" class="icon-btn" type="button" title="Redo · Ctrl+Y / Ctrl+Shift+Z" aria-label="Redo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9h-9a7 7 0 0 0-7 7v1"/></svg>
+                      </button>
+                      <button id="clearMotdRaw" class="icon-btn danger" type="button" title="Xóa nội dung" aria-label="Xóa nội dung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M9 6V4h6v2M19 6l-1 15H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+                    </div>
+                  </div>
+                </div>
+
+                <details class="input-preview-details" data-persist-key="inputPreviewMotdOpen">
+                  <summary><span>Input Preview · source mapping</span><span class="details-count">MAP</span></summary>
+                  <div id="motdInputPreview" class="input-preview"></div>
+                </details>
+
+                <details class="compact-details server-import" data-persist-key="motdImportOpen">
+                  <summary>
+                    <svg class="si-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 7h.01M7 17h.01"/></svg>
+                    <span id="motdImportLabel">Get MOTD from server</span>
+                    <span id="motdImportBadge" class="details-count">PING</span>
+                  </summary>
+                  <div class="compact-details-body server-import-body">
+                    <div class="import-group">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+                      <input id="motdImportAddress" class="import-input" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="play.example.com" aria-label="Server address">
+                      <button id="motdImportBtn" class="btn small primary import-btn" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+                        <span id="motdImportBtnLabel">Ping &amp; import</span>
+                      </button>
+                    </div>
+                    <div class="import-meta">
+                      <span id="motdImportHint" class="import-hint">VD: play.example.com hoặc play.example.com:25565 · Enter để ping</span>
+                      <span id="motdImportStatus" class="import-status" role="status" aria-live="polite" hidden></span>
+                    </div>
+                  </div>
+                </details>
+
+                <details class="compact-details" data-persist-key="motdOptionsOpen">
+                  <summary><span id="motdOptionsLabel">Options</span><span class="details-count">OPTIONAL</span></summary>
+                  <div class="compact-details-body option-row">
+                    <label class="check"><span>Server Icon:</span><input id="motdIconUpload" class="file-input" type="file" accept=".png,image/png"><span>(64×64 PNG)</span></label>
+                  </div>
+                </details>
+
+                <div class="context-note">Enter, <code>\n</code>, <code>/n</code> (sau khoảng trắng hoặc mã màu, không trước chữ thường) hoặc <code>&lt;newline&gt;</code> đều là xuống dòng. Tool không tự cắt input.</div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h2 class="panel-title preview-title"><span class="live-dot"></span>Server list preview</h2>
+                <div class="panel-head-actions">
+                  <button id="copyMotdLegacy" class="btn small primary" type="button">Copy</button>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="preview-viewport">
+                  <div class="motd-preview">
+                    <div id="serverIconWrapper" class="server-icon-wrapper" title="Chọn ảnh logo server">
+                      <img id="serverIconPreview" class="server-icon" src="" alt="Server Icon">
+                      <div id="serverIconPlaceholder" class="server-icon-placeholder">64×64<br>.png</div>
+                    </div>
+                    <div class="motd-lines">
+                      <div id="motdPreviewLine1" class="motd-line"></div>
+                      <div id="motdPreviewLine2" class="motd-line"></div>
+                      <div id="motdPreviewPlayers" class="player-line"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="context-note">Viewport tham chiếu cố định. Màn hình nhỏ sẽ cuộn ngang thay vì cắt hoặc thêm “...”.</div>
+                <div id="serverPingDetails" class="server-ping-details"></div>
+                <div id="motdOutputs" class="code-output"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="textView" class="view">
+          <div class="view-grid">
+            <div class="panel">
+              <div class="panel-head">
+                <h2 class="panel-title">Universal MOTD input</h2>
+                <select id="textPreset" class="select" hidden aria-hidden="true" tabindex="-1" aria-label="Preset universal editor">
+                  <option value="empty">No preset</option>
+                  <option value="starter">Preset: starter</option>
+                  <option value="help">Preset: help line</option>
+                  <option value="whisper">Preset: whisper format</option>
+                  <option value="status">Preset: status states</option>
+                  <option value="fmtLegacy">Legacy &</option>
+                  <option value="fmtSection">Raw §</option>
+                  <option value="fmtBukkit">Bukkit &x</option>
+                  <option value="fmtMini">MiniMessage</option>
+                  <option value="fmtGradient">MiniMessage Gradient</option>
+                  <option value="fmtIridium">IridiumColorAPI</option>
+                </select>
+                <details class="inline-more">
+                  <summary id="textPresetMenuTrigger" class="btn small menu-trigger">Preset</summary>
+                  <div class="inline-more-menu">
+                    <div class="menu-label">Preset</div>
+                    <div class="menu-actions-grid single">
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="textPreset" data-preset-value="empty" id="textPresetEmpty">No preset</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="textPreset" data-preset-value="starter" id="textPresetStarter">Preset: starter</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="textPreset" data-preset-value="help" id="textPresetHelp">Preset: help line</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="textPreset" data-preset-value="whisper" id="textPresetWhisper">Preset: whisper format</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="textPreset" data-preset-value="status" id="textPresetStatus">Preset: status states</button>
+                    </div>
+                    <div class="menu-separator" role="separator"></div>
+                    <div class="menu-label format-presets-label">Format showcase</div>
+                    <div class="menu-actions-grid single">
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="textPreset" data-preset-value="fmtLegacy" id="textPresetFmtLegacy">Legacy &</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="textPreset" data-preset-value="fmtSection" id="textPresetFmtSection">Raw §</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="textPreset" data-preset-value="fmtBukkit" id="textPresetFmtBukkit">Bukkit &x</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="textPreset" data-preset-value="fmtMini" id="textPresetFmtMini">MiniMessage</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="textPreset" data-preset-value="fmtGradient" id="textPresetFmtGradient">MiniMessage Gradient</button>
+                      <button class="menu-action preset-menu-item" type="button" data-preset-target="textPreset" data-preset-value="fmtIridium" id="textPresetFmtIridium">IridiumColorAPI</button>
+                    </div>
+                  </div>
+                </details>
+              </div>
+              <div class="panel-body">
+                <div class="editor-card">
+                  <textarea id="textRaw" class="textarea code main-input" spellcheck="false" placeholder="VD: &amp;bChào mừng đến với server!"></textarea>
+                  <div class="editor-meta">
+                    <div class="editor-meta-left">
+                      <span id="textCharCounter" class="char-summary">Ký tự: 0</span>
+                    </div>
+                    <div class="editor-actions">
+                      <button id="undoText" class="icon-btn" type="button" title="Undo · Ctrl+Z" aria-label="Undo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 7 7v1"/></svg>
+                      </button>
+                      <button id="redoText" class="icon-btn" type="button" title="Redo · Ctrl+Y / Ctrl+Shift+Z" aria-label="Redo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9h-9a7 7 0 0 0-7 7v1"/></svg>
+                      </button>
+                      <button id="clearTextRaw" class="icon-btn danger" type="button" title="Xóa nội dung" aria-label="Xóa nội dung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M9 6V4h6v2M19 6l-1 15H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
+                    </div>
+                  </div>
+                </div>
+
+                <details class="input-preview-details" data-persist-key="inputPreviewTextOpen">
+                  <summary><span>Input Preview · source mapping</span><span class="details-count">MAP</span></summary>
+                  <div id="textInputPreview" class="input-preview"></div>
+                </details>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head"><h2 class="panel-title">Live output</h2></div>
+              <div class="panel-body">
+                <div id="textPreview" class="preview-box large"></div>
+                <div id="textOutputs" class="output-list"></div>
+                <div class="context-note">Enter, <code>\n</code>, <code>/n</code> (sau khoảng trắng hoặc mã màu, không trước chữ thường) và <code>&lt;newline&gt;</code> đều được hiểu là xuống dòng trong tool.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="formatView" class="view">
+          <div class="panel">
+            <div class="panel-head"><h2 class="panel-title">Format Notes</h2></div>
+            <div class="panel-body">
+              <div class="format-grid">
+                <article class="format-card">
+                  <strong>Legacy &amp;</strong>
+                  <code>&amp;b&amp;lHello</code>
+                  <p class="hint format-note" data-format-note="legacy"></p>
+                </article>
+                <article class="format-card">
+                  <strong>Raw §</strong>
+                  <code>§b§lHello</code>
+                  <p class="hint format-note" data-format-note="section"></p>
+                </article>
+                <article class="format-card">
+                  <strong>MiniMessage &lt;&gt;</strong>
+                  <code>&lt;#42D4F5&gt;&lt;b&gt;Hello&lt;/b&gt;</code>
+                  <p class="hint format-note" data-format-note="mini"></p>
+                </article>
+                <article class="format-card">
+                  <strong>MiniMessage Gradient</strong>
+                  <code>&lt;gradient:#42D4F5:#FF4D6B&gt;Hello&lt;/gradient&gt;</code>
+                  <p class="hint format-note" data-format-note="gradient"></p>
+                </article>
+                <article class="format-card">
+                  <strong>IridiumColorAPI</strong>
+                  <code>&lt;SOLID:42D4F5&gt;&amp;lHello</code>
+                  <p class="hint format-note" data-format-note="iridium"></p>
+                </article>
+                <article class="format-card">
+                  <strong>Bukkit &amp;x</strong>
+                  <code>&amp;x&amp;4&amp;2&amp;D&amp;4&amp;F&amp;5Hello</code>
+                  <p class="hint format-note" data-format-note="bukkit"></p>
+                </article>
+                <article class="format-card">
+                  <strong>Formatting</strong>
+                  <code>&amp;l bold · &amp;m strikethrough · &amp;n underline · &amp;o italic · &amp;k obfuscated · &amp;r reset</code>
+                  <p class="hint format-note" data-format-note="formatting"></p>
+                </article>
+              </div>
+              <p class="hint" style="margin-top:10px" id="formatNotesFooter"></p>
+            </div>
+          </div>
+        </section>
+
+        <section id="aboutView" class="view">
+          <div class="panel">
+            <div class="panel-head"><h2 class="panel-title" id="aboutTitle">About</h2></div>
+            <div class="panel-body about-body">
+              <div class="about-hero">
+                <div class="about-logo" aria-hidden="true">MOTD Lab</div>
+                <p class="about-tagline" data-about="tagline"></p>
+              </div>
+              <div class="format-grid about-grid">
+                <article class="format-card"><strong data-about="f1Title"></strong><p class="hint" data-about="f1"></p></article>
+                <article class="format-card"><strong data-about="f2Title"></strong><p class="hint" data-about="f2"></p></article>
+                <article class="format-card"><strong data-about="f3Title"></strong><p class="hint" data-about="f3"></p></article>
+                <article class="format-card"><strong data-about="f4Title"></strong><p class="hint" data-about="f4"></p></article>
+              </div>
+              <div class="about-release" id="aboutRelease">
+                <strong data-about="releaseTitle"></strong>
+                <div class="about-release-row">
+                  <span class="about-version" id="aboutVersion"></span>
+                  <span class="about-release-date" id="aboutReleaseDate"></span>
+                  <span class="import-status" id="aboutReleaseStatus" data-state="loading" role="status"></span>
+                  <a class="about-changelog" id="aboutChangelog" href="https://github.com/AnyaChann/MOTD-Lab/releases" target="_blank" rel="noopener noreferrer" data-about="changelog"></a>
+                </div>
+              </div>
+              <div class="about-privacy"><strong data-about="privacyTitle"></strong><p class="hint" data-about="privacy"></p></div>
+              <div class="about-credit">
+                <span><span data-credit="pre">Made for 2c2tmc with</span> <span class="footer-heart" role="img" aria-label="love">💖</span> <span data-credit="by">by</span> <a href="https://github.com/AnyaChann" target="_blank" rel="noopener noreferrer">AnyaChann</a></span>
+                <a class="btn small about-github" href="https://github.com/AnyaChann/MOTD-Lab" target="_blank" rel="noopener noreferrer">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.1-1.3-.4-2.6-1.3-3.6.4-1.1.4-2.4 0-3.5 0 0-1.1-.3-3.6 1.4a12.4 12.4 0 0 0-6.2 0C6.4 2.6 5.3 2.9 5.3 2.9c-.4 1.1-.4 2.4 0 3.5A5.4 5.4 0 0 0 4 10c0 3.5 3 5.5 6 5.5-.4.4-.8 1.1-.9 2.1M9 18c-4.5 2-5-2-7-2"/></svg>
+                  <span>GitHub</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </section>
+
+    <footer class="footer">
+      <span id="footerAuto"></span>
+      <span class="footer-credit"><span id="footerTools"></span> · <span data-credit="pre">Made for 2c2tmc with</span> <span class="footer-heart" role="img" aria-label="love">💖</span> <span data-credit="by">by</span> <a href="https://github.com/AnyaChann" target="_blank" rel="noopener noreferrer">AnyaChann</a></span>
+    </footer>
+  </main>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <script>
+@@JS@@
+  </script>
+</body>
+</html>
