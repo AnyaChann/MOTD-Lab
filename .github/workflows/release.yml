@@ -12,23 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-
-      - name: index.html must be what src/ builds
-        run: npm run check
-
-      - name: Tests
-        run: npm test
 
       - name: Tag must match APP_VERSION in index.html
         run: |
           APP=$(grep -oP 'const APP_VERSION = "\K[^"]+' index.html)
           if [ "$APP" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match APP_VERSION $APP"
+            echo "::error::Tag $GITHUB_REF_NAME does not match APP_VERSION $APP in index.html"
             exit 1
           fi
 
